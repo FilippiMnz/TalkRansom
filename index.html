@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>PEBKAC | A Criptografia Nunca Foi o Problema</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Geist:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reset.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reveal.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/plugin/highlight/monokai.min.css" />
+    <style>
+        :root {
+            --r-main-font: 'Geist', sans-serif;
+            --r-heading-font: 'Geist', sans-serif;
+            --r-main-font-size: 26px;
+            --r-heading-text-transform: none;
+            --r-heading-font-weight: 700;
+            --r-background-color: #09090b;
+            --r-main-color: #d4d4d8;
+            --accent: #a855f7;
+            --accent-deep: #7e22ce;
+            --accent-glow: rgba(168, 85, 247, 0.3);
+            --orange: #f97316;
+            --bg: #09090b;
+            --bg-card: #0f0f11;
+            --border: #27272a;
+            --border-accent: rgba(168, 85, 247, 0.3);
+            --fg: #d4d4d8;
+            --fg-muted: #71717a;
+            --red: #ef4444;
+        }
+
+        html, body {
+            background-color: #09090b !important;
+            background-image:
+                linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px) !important;
+            background-size: 40px 40px !important;
+        }
+
+        .reveal {
+            background-color: #09090b !important;
+            background-image:
+                linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px) !important;
+            background-size: 40px 40px !important;
+            font-family: 'Geist', sans-serif;
+            color: var(--fg);
+        }
+
+        .reveal .slides section {
+            background: transparent !important;
+        }
+
+        .reveal .slides section[data-background] {
+            background: transparent !important;
+        }
+
+        .reveal h1, .reveal h2, .reveal h3, .reveal h4 {
+            color: var(--fg) !important;
+            font-family: 'Geist', sans-serif !important;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+        .reveal h1 {
+            font-size: 2.6em;
+            font-weight: 800;
+            background: linear-gradient(135deg, #c084fc 0%, #a855f7 50%, #7e22ce 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .reveal h2 { font-size: 1.8em; color: #c084fc !important; }
+        .reveal h3 { font-size: 1.3em; color: #a855f7 !important; }
+        .reveal .slides section {
+            text-align: left;
+            padding: 0 40px;
+        }
+        .reveal a { color: var(--accent); }
+
+        .terminal-font {
+            font-family: 'DotGothic16', monospace;
+            letter-spacing: 1px;
+        }
+
+        .box {
+            border: 1px solid var(--border-accent);
+            padding: 24px;
+            background: var(--bg-card);
+            border-radius: 4px;
+            margin: 16px 0;
+        }
+        .box-red {
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            padding: 24px;
+            background: rgba(239, 68, 68, 0.03);
+            border-radius: 4px;
+            margin: 16px 0;
+        }
+        .text-red { color: var(--red); }
+        .text-accent { color: #c084fc; }
+        .text-orange { color: var(--orange); }
+        .text-muted { color: var(--fg-muted); }
+
+        .label {
+            background: rgba(168, 85, 247, 0.1);
+            border: 1px solid rgba(168, 85, 247, 0.3);
+            color: #c084fc;
+            padding: 4px 14px;
+            font-weight: 600;
+            font-size: 0.65em;
+            font-family: 'DotGothic16', monospace;
+            letter-spacing: 2px;
+            display: inline-block;
+            margin-bottom: 12px;
+            border-radius: 2px;
+        }
+        .label-red {
+            background: rgba(239, 68, 68, 0.08);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #f87171;
+            padding: 4px 14px;
+            font-weight: 600;
+            font-size: 0.65em;
+            font-family: 'DotGothic16', monospace;
+            letter-spacing: 2px;
+            display: inline-block;
+            margin-bottom: 12px;
+            border-radius: 2px;
+        }
+
+        pre {
+            font-size: 0.55em !important;
+            border-radius: 4px !important;
+            border: 1px solid var(--border) !important;
+            background: #0f0f11 !important;
+        }
+        pre code {
+            border-radius: 4px !important;
+            padding: 20px !important;
+        }
+
+        table {
+            font-size: 0.7em;
+            border-collapse: collapse;
+            width: 100%;
+            margin: 12px 0;
+        }
+        table th {
+            border-bottom: 2px solid var(--accent);
+            padding: 10px 8px;
+            text-align: left;
+            color: #c084fc;
+        }
+        table td {
+            padding: 8px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        ul, ol { margin-left: 0; padding-left: 1.2em; }
+        li { margin-bottom: 6px; }
+
+        blockquote {
+            border-left: 3px solid var(--accent);
+            padding-left: 20px;
+            margin: 16px 0;
+            color: #a1a1aa;
+            font-style: italic;
+        }
+
+        .tag {
+            display: inline-block;
+            background: rgba(168, 85, 247, 0.08);
+            border: 1px solid rgba(168, 85, 247, 0.2);
+            color: #c084fc;
+            padding: 2px 10px;
+            border-radius: 2px;
+            font-size: 0.6em;
+            font-weight: 600;
+            font-family: 'DotGothic16', monospace;
+            letter-spacing: 1px;
+            margin: 2px;
+        }
+
+        .status-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--orange);
+            box-shadow: 0 0 8px rgba(249, 115, 22, 0.6);
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        .separator {
+            border: none;
+            border-top: 1px solid var(--border);
+            margin: 20px 0;
+        }
+
+        .reveal-viewport {
+            background-color: #09090b !important;
+        }
+        .reveal .backgrounds {
+            background-color: #09090b !important;
+        }
+
+        /* ===== ESTRELAS DECORATIVAS NO FUNDO ===== */
+        .reveal-viewport::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 998;
+            opacity: 0.15;
+            background-image: 
+                url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23a855f7'%3E%3Cpath d='M12 0L13.5 10.5L24 12L13.5 13.5L12 24L10.5 13.5L0 12L10.5 10.5L12 0Z'/%3E%3C/svg%3E"),
+                url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23c084fc'%3E%3Cpath d='M12 0L13.5 10.5L24 12L13.5 13.5L12 24L10.5 13.5L0 12L10.5 10.5L12 0Z'/%3E%3C/svg%3E"),
+                url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23d4d4d8'%3E%3Cpath d='M12 0L13.5 10.5L24 12L13.5 13.5L12 24L10.5 13.5L0 12L10.5 10.5L12 0Z'/%3E%3C/svg%3E"),
+                url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2371717a'%3E%3Cpath d='M12 0L13.5 10.5L24 12L13.5 13.5L12 24L10.5 13.5L0 12L10.5 10.5L12 0Z'/%3E%3C/svg%3E");
+            background-size: 16px 16px, 10px 10px, 12px 12px, 8px 8px;
+            background-position: 
+                5% 15%,
+                85% 20%,
+                15% 75%,
+                92% 80%;
+            background-repeat: no-repeat;
+        }
+
+        /* ===== LOGO RELÂMPAGO - CANTO SUPERIOR DIREITO ===== */
+        .reveal-viewport::after {
+            content: '';
+            position: fixed;
+            top: 18px;
+            right: 28px;
+            width: 38px;
+            height: 38px;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23a855f7' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolygon points='13 2 3 14 12 14 11 22 21 10 12 10 13 2'/%3E%3C/svg%3E");
+            background-size: contain;
+            background-repeat: no-repeat;
+            opacity: 0.5;
+            z-index: 1000;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            filter: drop-shadow(0 0 6px rgba(168, 85, 247, 0.5));
+        }
+        .reveal-viewport:hover::after {
+            opacity: 0.85;
+        }
+
+        /* ===== SETAS DE NAVEGAÇÃO - 4 NO CANTO INFERIOR DIREITO ===== */
+        .reveal .controls {
+            color: #a855f7 !important;
+            opacity: 0.85 !important;
+        }
+        .reveal .controls .controls-arrow {
+            color: #a855f7 !important;
+            opacity: 1 !important;
+        }
+        .reveal .controls .controls-arrow:hover,
+        .reveal .controls .controls-arrow:focus {
+            color: #c084fc !important;
+            opacity: 1 !important;
+            text-shadow: 0 0 12px rgba(168, 85, 247, 0.8) !important;
+        }
+        .reveal .controls button {
+            color: #a855f7 !important;
+            background: transparent !important;
+            border: none !important;
+            width: 40px !important;
+            height: 40px !important;
+            transition: all 0.2s ease !important;
+        }
+        .reveal .controls button:hover {
+            background: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
+            transform: scale(1.15) !important;
+        }
+        .reveal .controls button svg {
+            filter: drop-shadow(0 0 4px rgba(168, 85, 247, 0.5)) !important;
+        }
+        .reveal .controls .navigate-left,
+        .reveal .controls .navigate-right,
+        .reveal .controls .navigate-up,
+        .reveal .controls .navigate-down {
+            border: none !important;
+        }
+        .reveal .controls .navigate-left.enabled,
+        .reveal .controls .navigate-right.enabled,
+        .reveal .controls .navigate-up.enabled,
+        .reveal .controls .navigate-down.enabled {
+            border: none !important;
+            opacity: 1 !important;
+        }
+        .reveal .controls .navigate-left.enabled:hover,
+        .reveal .controls .navigate-right.enabled:hover {
+            color: #c084fc !important;
+            background: transparent !important;
+            border: none !important;
+        }
+        .reveal .controls .navigate-left.enabled:hover svg,
+        .reveal .controls .navigate-right.enabled:hover svg {
+            filter: drop-shadow(0 0 8px rgba(168, 85, 247, 0.8)) !important;
+        }
+        .reveal .controls .navigate-up.enabled:hover,
+        .reveal .controls .navigate-down.enabled:hover {
+            color: #f97316 !important;
+            background: transparent !important;
+            border: none !important;
+        }
+        .reveal .controls .navigate-up.enabled:hover svg,
+        .reveal .controls .navigate-down.enabled:hover svg {
+            filter: drop-shadow(0 0 8px rgba(249, 115, 22, 0.8)) !important;
+            color: #f97316 !important;
+        }
+        .reveal .progress {
+            color: #a855f7 !important;
+            height: 3px !important;
+        }
+        .reveal .progress span {
+            background: linear-gradient(90deg, #7e22ce, #a855f7, #c084fc) !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="reveal">
+        <div class="slides">
+
+            <!-- ===== CAPA ===== -->
+            <section data-markdown>
+                <textarea data-template>
+                    # PEBKAC - A Criptografia Nunca Foi o Problema
+                    ### Como erros humanos derrotam implementações criptográficas em ransomwares
+                    <div class="separator"></div>
+                    <span class="terminal-font text-muted">d0ndarr1on@blackhaven-01:~$ ./talk.sh --topic ransomware</span>
+                </textarea>
+            </section>
+
+            <!-- ===== WHOAMI ===== -->
+            <section data-markdown>
+                <textarea data-template>
+                    ## whoami
+                    
+                    <div style="display: flex; align-items: center; gap: 40px;">
+                        <div style="line-height: 2.0; font-size: 0.9em;">
+                            -> <span class="terminal-font text-accent">Filippi Reis</span>, também conhecido como <span class="terminal-font text-accent">Smith</span>.<br>
+                            -> Segurança ofensiva. Security researcher. CTF Player<br>
+                            -> Maluco em tempo integral - AuDHD • Procastinador Profissional<br>
+                            -> Estudante CComp - Universidade Federal de Sergipe<br>
+                            -> @/RaulHC/Axesec/AFK<br>
+                            -> Foco: Purple Team • Baixo Nivel • Criptografia.
+                        </div>
+                        <div style="flex-shrink: 0;">
+                            <img src="chapeu.png" style="width: 200px; height: 200px; border-radius: 4px; border: 1px solid rgba(168, 85, 247, 0.4); object-fit: cover; filter: grayscale(30%);" />
+                        </div>
+                    </div>
+                    <br>
+                    <span class="text-muted">"The night is dark and full of terrors."</span>
+                </textarea>
+            </section>
+
+            <!-- ===== OBJETIVO ===== -->
+            <section data-markdown>
+                <textarea data-template>
+                    <span class="label">OBJETIVO</span>
+                    ## Demonstrar como nasce um decryptor
+                    * AES, RSA, ChaCha20 seguem **extremamente seguros** — se usados corretamente.
+                    * O que permite criar decryptors é puramente **erro humano**.
+                    * Implementação incorreta, gerenciamento inadequado de chaves, ou apreensão policial.
+                    * **PEBKAC: Problem Exists Between Keyboard And Chair.** 
+                </textarea>
+            </section>
+
+            <!-- ===== AGENDA ===== -->
+            <section data-markdown>
+                <textarea data-template>
+                    ## Estrutura da Talk
+                    | Bloco | Tema |
+                    |-------|------|
+                    | 1 | A Criptografia Funciona |
+                    | 2 | O Problema é o Dev  |
+                    | 3 | Demonstração Prática |
+                    | Bonus | AES caseiro em C puro |
+                </textarea>
+            </section>
+
+            <!-- ===== CONCEITO ===== -->
+            <section data-markdown>
+                <textarea data-template>
+                    <span class="label">CONCEITO</span>
+                    ## Ransomware ≠ Wiper
+                    * **Ransomware:** Cifra para extorquir. A chave existe. O dado é recuperável.
+                    * **Wiper:** Cifra para destruir. A chave nunca existiu. O dado é perdido para sempre.
+                    <div class="box-red">
+                        <strong>NotPetya (2017):</strong> Parecia ransomware, mas era wiper. A "chave" era um UUID aleatório descartado na hora. Mesmo pagando, impossível recuperar.
+                    </div>
+                    > "NotPetya não queria seu dinheiro. Queria ver o mundo queimar."
+                </textarea>
+            </section>
+
+            <!-- ===== COMO FUNCIONA UM RANSOMWARE ===== -->
+            <section data-markdown>
+                <textarea data-template>
+                    <span class="label">CONCEITO</span>
+                    ## Como um Ransomware Funciona?
+                    
+                    **Criptografia Simétrica (AES):**
+                    * Uma única chave para cifrar E decifrar.
+                    * Rápida. Ideal para arquivos grandes.
+                    * Problema: como entregar a chave sem ser interceptada?
+                    
+                    **Criptografia Assimétrica (RSA):**
+                    * Duas chaves: pública (cifra) e privada (decifra).
+                    * A chave pública pode ser compartilhada abertamente.
+                    * A chave privada nunca sai do atacante.
+                    
+                    <div class="box">
+                        <strong>Ransomware real = Híbrido:</strong><br>
+                        1. Gera chave AES aleatória (rápida)<br>
+                        2. Cifra arquivos com AES<br>
+                        3. Cifra a chave AES com RSA público do atacante<br>
+                        4. Apaga a chave AES da memória<br>
+                        <span class="text-accent">Resultado: só o atacante (dono da chave privada RSA) pode recuperar.</span>
+                    </div>
+                </textarea>
+            </section>
+
+            <!-- ===== BLOCO 1 ===== -->
+            <section>
+                <section data-markdown>
+                    <textarea data-template>
+                        <span class="label">BLOCO 1</span>
+                        ## Quando a Criptografia Funciona
+                        Casos onde o decryptor **NÃO** veio de falha técnica, mas de **apreensão policial**. A matemática permaneceu intacta.
+                    </textarea>
+                </section>
+
+                <section data-markdown>
+                    <textarea data-template>
+                        <span class="label">BLOCO 1</span>
+                        ## CryptoLocker (2013)
+                        ### O Pioneiro da Criptografia Híbrida
+                        * **AES-256** para cifrar arquivos (rápido e implacável).
+                        * **RSA-2048** para proteger a chave AES (key wrapping).
+                        * Chave AES gerada aleatoriamente. Nunca toca o disco em texto claro.
+                        * Chave privada RSA existe apenas no servidor C2 do atacante.
+                        <div class="box">
+                            <strong>Como foi derrotado?</strong><br>
+                            Operação Tovar (FBI/Interpol) → apreensão dos servidores C2 e chaves privadas.<br>
+                            <span class="terminal-font text-accent">A criptografia nunca foi quebrada. A infra que caiu.</span>
+                        </div>
+                    </textarea>
+                </section>
+
+                <section data-markdown>
+                    <textarea data-template>
+                        <span class="label">BLOCO 1</span>
+                        ## Hive (2021-2022)
+                        * Grupo extremamente ativo. Alvejaram hospitais, infraestrutura crítica.
+                        * FBI manteve acesso à infraestrutura por **7 meses** antes de agir.
+                        * Em 2022, distribuíram chaves de decifragem para vítimas.
+                        * <span class="text-accent">A criptografia não foi quebrada. O C2 foi comprometido.</span>
+                        <div class="box-red">
+                            <strong>Porém...</strong> Algumas variações tinham falhas humanas:<br>
+                            • Chave exposta na memória antes da limpeza<br>
+                            • Vazamento parcial no tráfego de rede<br>
+                            • Gerenciamento preguiçoso de buffers
+                        </div>
+                    </textarea>
+                </section>
+
+                <section data-markdown>
+                    <textarea data-template>
+                        <span class="label">BLOCO 1</span>
+                        ## NotPetya (2017) — O Caso Atípico
+                        * Parecia ransomware: tela de resgate, endereço Bitcoin.
+                        * Na prática: corrompia permanentemente. A "chave" era aleatória e descartada.
+                        * Atribuído à Rússia. Alvo principal: Ucrânia.
+                        * Usava EternalBlue (NSA leak) para se espalhar. +$10 bilhões em danos.
+                        <div class="box-red">
+                            <strong>Este NÃO é ransomware.</strong> É um wiper.<br>
+                            Usou criptografia como arma de destruição, não de extorsão.<br>
+                            <span class="text-red">Wiper ≠ Ransomware.</span>
+                        </div>
+                    </textarea>
+                </section>
+            </section>
+
+            <!-- ===== BLOCO 2 ===== -->
+            <section>
+                <section data-markdown>
+                    <textarea data-template>
+                        <span class="label-red">BLOCO 2</span>
+                        ## O Problema é o Dev
+                        Casos onde a criptografia era **teoricamente correta**, mas a implementação foi tão descuidada que decryptors surgiram em **horas ou dias**.
+                    </textarea>
+                </section>
+
+                <section data-markdown>
+                    <textarea data-template>
+                        <span class="label-red">BLOCO 2</span>
+                        ## Petya — Versões Iniciais (2016)
+                        * **Abordagem inteligente:** Cifrava a MFT (Master File Table), não os arquivos.
+                        * Sistema nem conseguia "ver" os arquivos no disco.
+                        * **Falha:** Derivação de chave com entropia baixa. Seed previsível (dados da vítima).
+                        <div class="box-red">
+                            <strong>Resultado:</strong> Decryptors exploraram a derivação frágil.<br>
+                            A ideia era genial. A execução deixou a porta aberta.
+                        </div>
+                    </textarea>
+                </section>
+
+                <section data-markdown>
+                    <textarea data-template>
+                        <span class="label-red">BLOCO 2</span>
+                        ## Stampado — Criptografia de Centavos
+                        A "criptografia" era **XOR com reutilização de chave**.
+                        * Chave curta e repetida ciclicamente.
+                        * Dois arquivos com mesma keystream: `Cifra1 XOR Cifra2 = Plain1 XOR Plain2`.
+                        * Conhecendo um cabeçalho (ex: `%PDF-1.4`), recupera todo o resto.
+                        * Chave extraível do binário com `strings`.
+                        > "A matemática não perdoa preguiça. Ainda mais com XOR."
+                    </textarea>
+                </section>
+
+                <section data-markdown>
+                    <textarea data-template>
+                        <span class="label-red">BLOCO 2</span>
+                        ## HiddenTear — O Presente que Virou Praga
+                        * **Origem nobre:** Material didático de um professor. Código aberto no GitHub.
+                        * **Uso criminoso:** Copiaram sem entender nada. Cegos no escuro.
+                        * Dezenas de variantes... **todas quebradas**.
+                        <div class="box">
+                            O algoritmo era correto: AES-256.<br>
+                            <span class="text-red">A implementação criminosa conseguiu ser pior que a didática.</span>
+                        </div>
+                    </textarea>
+                </section>
+
+                <section data-markdown>
+                    <textarea data-template>
+                        <span class="label-red">BLOCO 2</span>
+                        ## HiddenTear — Catálogo de Erros
+                        | # | Erro encontrado nas variantes |
+                        |---|------|
+                        | 1 | Chave em texto plano no binário (`strings ransomware.exe`) |
+                        | 2 | Reutilização de chaves (mesma chave para tudo e todos) |
+                        | 3 | Chave viva em memória por tempo excessivo (dump → extração) |
+                        | 4 | Sem limpeza de buffers (recuperação forense da RAM) |
+                        | 5 | Debug ativo em produção (`Console.WriteLine(senha)`) |
+                        | 6 | Senha hardcoded: `"MyCryptoKey123"` |
+                        <br>
+                        <strong>Resultado:</strong> Dezenas de decryptors públicos em dias.
+                    </textarea>
+                </section>
+            </section>
+
+            <!-- ===== BLOCO 3 ===== -->
+            <section>
+                <section data-markdown>
+                    <textarea data-template>
+                        <span class="label">BLOCO 3</span>
+                        ## Demonstração Prática 🧪
+                        **Objetivo:** Provar a tese ao vivo. VM isolada. Três cenários.
+                        * **Caso 1:** Ransomware bem implementado → AES-256 + RSA-4096 + limpeza de memória.
+                        * **Caso 2:** MESMO código, com erro humano → chave hardcoded, nonce fixo, sem RSA.
+                        * **Bônus:** AES implementado manualmente em C → S-Box errada, rounds errados.
+                    </textarea>
+                </section>
+
+                <section data-markdown>
+                    <textarea data-template>
+                        <span class="label">BLOCO 3</span>
+                        ## Caso 1: O Ransomware Perfeito
+                        * AES-256-CTR com chave aleatória (`/dev/urandom`).
+                        * RSA-4096 OAEP SHA-256 para key wrapping.
+                        * Nonce único por sessão. Limpeza explícita de memória (`memset` + `del`).
+                        <div class="box">
+                            <strong>Resultado esperado:</strong><br>
+                            Impossível decifrar sem a chave privada RSA-4096.<br>
+                            <span class="text-red">Força bruta: 2^256 combinações. ~10^60 anos.</span><br>
+                            <span class="terminal-font text-accent">AES e RSA fizeram seu trabalho. Ninguém passa por eles.</span>
+                        </div>
+                    </textarea>
+                </section>
+
+                <section data-markdown>
+                    <textarea data-template>
+                        <span class="label">BLOCO 3</span>
+                        ## Caso 1 — Execução no Terminal
+                        <span class="terminal-font text-muted">$ python3 encrypt.py</span><br>
+                        <span class="terminal-font text-accent">[+] Chave AES-256: a3f2b8c1... (32 bytes aleatórios)</span><br>
+                        <span class="terminal-font text-accent">[+] Nonce: 7d4e9f2a... (16 bytes aleatórios)</span><br>
+                        <span class="terminal-font text-accent">[+] Chave AES envolvida com RSA-4096 OAEP</span><br>
+                        <span class="terminal-font text-accent">[+] Memória limpa. Chave AES só existe cifrada com RSA.</span>
+                        <div class="separator"></div>
+                        <span class="terminal-font text-muted">$ python3 decrypt_vitima.py</span><br>
+                        <span class="terminal-font text-red">[!] Chave AES está envolta em RSA-4096.</span><br>
+                        <span class="terminal-font text-red">[!] Força bruta: 2^256 combinações. ~10^60 anos.</span><br>
+                        <span class="terminal-font text-red">[✘] VEREDITO: MATEMATICAMENTE IMPOSSÍVEL.</span>
+                    </textarea>
+                </section>
+
+                <section data-markdown>
+                    <textarea data-template>
+                        <span class="label-red">BLOCO 3</span>
+                        ## Caso 2: O Erro Humano
+                        **MESMO algoritmo. MESMA estrutura. MESMO AES-256-CTR.**
+                        | # | Erro Introduzido |
+                        |---|-----------------|
+                        | 1 | Chave AES hardcoded: `b"MinhaChaveSuperSecreta123456"` |
+                        | 2 | Nonce fixo: `b"\x00" * 16` (zeros) |
+                        | 3 | Sem RSA: preencheram o campo com zeros (lixo) |
+                        | 4 | Sem limpeza de memória |
+                        <div class="box-red">
+                            A vítima vê os mesmos arquivos `.encrypted`. Mas a chave está no código-fonte.
+                        </div>
+                    </textarea>
+                </section>
+
+                <section data-markdown>
+                    <textarea data-template>
+                        <span class="label-red">BLOCO 3</span>
+                        ## Caso 2 — O Decryptor (10 Minutos Depois)
+                        <span class="terminal-font text-muted">Análise do binário com strings:</span><br>
+                        <span class="terminal-font text-accent">CHAVE_RECUPERADA = b"MinhaChaveSuperSecreta123456"</span><br>
+                        <span class="terminal-font text-accent">NONCE_RECUPERADO = b"\x00" * 16</span>
+                        <div class="separator"></div>
+                        <span class="terminal-font text-muted">Decryptor em Python (menos de 20 linhas):</span><br>
+                        <span class="terminal-font text-accent">cipher = Cipher(algorithms.AES(CHAVE), modes.CTR(NONCE))</span><br>
+                        <span class="terminal-font text-accent">dados = decryptor.update(cifrados) + decryptor.finalize()</span>
+                        <div class="box">
+                            <strong>Resultado:</strong> Todos os arquivos recuperados em segundos.<br>
+                            <span class="terminal-font text-accent">"Não precisei quebrar AES. Só precisei ler o código."</span>
+                        </div>
+                    </textarea>
+                </section>
+
+                <section data-markdown>
+                    <textarea data-template>
+                        <span class="label">BLOCO 3</span>
+                        ## Caso 1 vs Caso 2 — Comparação Direta
+                        | Aspecto | Caso 1 (Seguro) | Caso 2 (Falho) |
+                        |---------|-----------------|----------------|
+                        | Algoritmo | AES-256-CTR | AES-256-CTR |
+                        | Chave AES | Aleatória (256 bits de entropia) | Hardcoded no código |
+                        | Nonce | Aleatório (128 bits) | Fixo (zeros) |
+                        | Proteção da chave | RSA-4096 OAEP SHA-256 | Nenhuma (lixo) |
+                        | Tempo para quebrar | ~10^60 anos | ~10 minutos |
+                        | Status final | INQUEBRÁVEL | TRIVIAL |
+                        > "Mesmo algoritmo. Mesma biblioteca. Resultados opostos. A diferença? O fator humano."
+                    </textarea>
+                </section>
+            </section>
+
+            <!-- ===== BÔNUS ===== -->
+            <section>
+                <section data-markdown>
+                    <textarea data-template>
+                        <span class="label">BÔNUS</span>
+                        ## O Perigo do "AES de Garagem"
+                        Implementação manual de AES-256 em C puro. Sem bibliotecas.
+                        * S-Box, MixColumns, KeyExpansion — tudo na mão. Semanas de trabalho.
+                        * Resultado: **cifra podre**. Insegura. Quebrada em minutos por um criptoanalista.
+                        <div class="box-red">
+                            <strong>Erros introduzidos (propositais, para demonstrar):</strong><br>
+                            • S-Box com UM byte errado (0x42 ao invés de 0x41)<br>
+                            • MixColumns com operações de GF(2^8) faltando<br>
+                            • Número errado de rounds (10 vs 14 — AES-128 em vez de AES-256)<br>
+                            • Senha ASCII direto como chave, sem KDF (PBKDF2, Argon2)
+                        </div>
+                    </textarea>
+                </section>
+
+                <section data-markdown>
+                    <textarea data-template>
+                        <span class="label">BÔNUS</span>
+                        ## O Resultado do AES Caseiro 💥
+                        <span class="terminal-font text-muted">$ cat documento.txt</span><br>
+                        <span class="terminal-font">Este é um documento confidencial da empresa XYZ.</span>
+                        <div class="separator"></div>
+                        <span class="terminal-font text-muted">$ ./aes_caseiro encrypt documento.txt doc.enc</span><br>
+                        <span class="terminal-font text-accent">[✔] Cifrado: doc.enc</span>
+                        <div class="separator"></div>
+                        <span class="terminal-font text-muted">$ ./aes_caseiro decrypt doc.enc doc_rec.txt</span><br>
+                        <span class="terminal-font text-red">⚠ Decifragem pode estar CORROMPIDA!</span>
+                        <div class="separator"></div>
+                        <span class="terminal-font text-muted">$ cat doc_rec.txt</span><br>
+                        <span class="terminal-font text-red">Este é um d�cumento confi�encial da e�presa XYZ.</span><br>
+                        <span class="terminal-font text-red">C�ntém dados sen��veis que preci�am ser prote�idos.</span>
+                        <div class="separator"></div>
+                        <span class="text-red">☝️ CORROMPIDO! Nem o próprio autor consegue reverter. A cifra é lixo.</span>
+                    </textarea>
+                </section>
+
+                <section data-markdown>
+                    <textarea data-template>
+                        <span class="label">BÔNUS</span>
+                        ## Moral do AES Caseiro
+                        | ❌ NUNCA FAÇA | ✅ SEMPRE FAÇA |
+                        |---------------|----------------|
+                        | Implementar criptografia do zero | Usar bibliotecas auditadas |
+                        | Copiar S-Box da internet | Testar com vetores oficiais (NIST) |
+                        | Usar senha como chave direto | Usar KDF: PBKDF2, bcrypt, Argon2 |
+                        | Confiar em "parece que funciona" | OpenSSL, libsodium, cryptography.py |
+                        > "Implementar AES do zero é um exercício acadêmico fascinante. Usar em produção é negligência pura."
+                    </textarea>
+                </section>
+            </section>
+
+            <!-- ===== CONCLUSÃO ===== -->
+            <section>
+                <section data-markdown>
+                    <textarea data-template>
+                        <span class="label">CONCLUSÃO</span>
+                        ## A Tese Está Provada
+                        <div class="box">
+                            A criptografia <span class="text-accent">não falhou</span> em nenhum momento.<br>
+                            AES continua <span class="text-accent">inquebrável</span>.<br>
+                            RSA continua <span class="text-accent">inquebrável</span>.<br>
+                            ChaCha20 continua <span class="text-accent">inquebrável</span>.<br><br>
+                            Quem falhou fui <span class="text-red">eu — o humano</span> —<br>
+                            com pressa, preguiça ou ignorância.<br><br>
+                            <span class="terminal-font text-accent">PEBKAC. Problem Exists Between Keyboard And Chair.</span>
+                        </div>
+                    </textarea>
+                </section>
+
+                <section data-markdown>
+                    <textarea data-template>
+                        <span class="label">CONCLUSÃO</span>
+                        ## O Elo Mais Fraco da Segurança
+                        <span class="terminal-font">Algoritmos → <span class="text-accent"> Seguros</span> (matemática comprovada há décadas)</span><br>
+                        <span class="terminal-font">Bibliotecas → <span class="text-accent"> Auditadas</span> (milhares de especialistas)</span><br>
+                        <span class="terminal-font">Implementação → <span class="text-orange"> AQUI MORA O PERIGO</span></span><br>
+                        <span class="terminal-font">Humano → <span class="text-red"> Pressa, preguiça, ignorância</span></span>
+                        <div class="box">
+                            <strong>"A criptografia não é o elo fraco — nós somos."</strong><br>
+                            <span class="terminal-font text-accent">Estudem criptografia de verdade. Do outro lado, os criminosos já estão estudando.</span>
+                        </div>
+                    </textarea>
+                </section>
+
+                <section data-markdown>
+                    <textarea data-template>
+                        <span class="label">RECOMENDAÇÕES</span>
+                        ## Para Defensores e Curiosos
+                        * Estude os decryptors públicos. Entenda as falhas comuns.
+                        * Use **bibliotecas auditadas**. Não reinvente a roda criptográfica.
+                        * Faça **code review focado em criptografia**.
+                        * Teste com vetores oficiais (NIST).
+                    </textarea>
+                </section>
+            </section>
+
+            <!-- ===== REFERÊNCIAS ===== -->
+            <section data-markdown>
+                <textarea data-template>
+                    <span class="label">REFERÊNCIAS</span>
+                    * **CryptoLocker:** github.com/ajayrandhawa/Cryptolocker
+                    * **Hive V5 Decryptor:** github.com/reecdeep/HiveV5_file_decryptor
+                    * **NotPetya Analysis:** github.com/a0zhar/NotPetya
+                    * **Petya Research:** gist.github.com/vulnersCom
+                    * **HiddenTear Original:** github.com/shintojoseph1234/hidden-tear-1
+                    * **Ransomware Database:** github.com/Cryakl/Ransomware-Database
+                    * **Cryptography.io:** cryptography.io
+                    * **CryptoHack:** cryptohack.org/
+                    * **pwn.college:** pwn.college/s 
+                    * **An Introduction to Mathematical Cryptography - Jeffrey Hoffstein** 
+                    <div class="separator"></div>
+                    <span class="terminal-font text-accent">Obrigado! Dúvidas?</span><br>
+                    <span class="terminal-font text-muted">[smith@blackhaven-01 ~]$ exit</span>
+                </textarea>
+            </section>
+
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reveal.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/plugin/notes/notes.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/plugin/markdown/markdown.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/plugin/highlight/highlight.min.js"></script>
+    <script>
+        Reveal.initialize({
+            hash: true,
+            center: true,
+            transition: 'slide',
+            backgroundTransition: 'fade',
+            backgroundColor: '#09090b',
+            controls: true,
+            controlsTutorial: false,
+            controlsLayout: 'bottom-right',
+            navigationMode: 'default',
+            plugins: [RevealMarkdown, RevealHighlight, RevealNotes],
+        });
+    </script>
+</body>
+</html>
