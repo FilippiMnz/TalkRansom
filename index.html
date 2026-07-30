@@ -132,7 +132,7 @@
         }
 
         pre {
-            font-size: 0.55em !important;
+            font-size: 0.7em !important;
             border-radius: 4px !important;
             border: 1px solid var(--border) !important;
             background: #0f0f11 !important;
@@ -140,6 +140,8 @@
         pre code {
             border-radius: 4px !important;
             padding: 20px !important;
+            font-size: 1em !important;
+            line-height: 1.6 !important;
         }
 
         table {
@@ -211,7 +213,6 @@
             background-color: #09090b !important;
         }
 
-        /* ===== ESTRELAS DECORATIVAS NO FUNDO ===== */
         .reveal-viewport::before {
             content: '';
             position: fixed;
@@ -236,7 +237,6 @@
             background-repeat: no-repeat;
         }
 
-        /* ===== LOGO RELÂMPAGO - CANTO SUPERIOR DIREITO ===== */
         .reveal-viewport::after {
             content: '';
             position: fixed;
@@ -257,7 +257,6 @@
             opacity: 0.85;
         }
 
-        /* ===== SETAS DE NAVEGAÇÃO - 4 NO CANTO INFERIOR DIREITO ===== */
         .reveal .controls {
             color: #a855f7 !important;
             opacity: 0.85 !important;
@@ -336,7 +335,6 @@
     <div class="reveal">
         <div class="slides">
 
-            <!-- ===== CAPA ===== -->
             <section data-markdown>
                 <textarea data-template>
                     # PEBKAC - A Criptografia Nunca Foi o Problema
@@ -346,7 +344,6 @@
                 </textarea>
             </section>
 
-            <!-- ===== WHOAMI ===== -->
             <section data-markdown>
                 <textarea data-template>
                     ## whoami
@@ -369,7 +366,6 @@
                 </textarea>
             </section>
 
-            <!-- ===== OBJETIVO ===== -->
             <section data-markdown>
                 <textarea data-template>
                     <span class="label">OBJETIVO</span>
@@ -381,7 +377,6 @@
                 </textarea>
             </section>
 
-            <!-- ===== AGENDA ===== -->
             <section data-markdown>
                 <textarea data-template>
                     ## Estrutura da Talk
@@ -394,7 +389,6 @@
                 </textarea>
             </section>
 
-            <!-- ===== CONCEITO ===== -->
             <section data-markdown>
                 <textarea data-template>
                     <span class="label">CONCEITO</span>
@@ -408,7 +402,6 @@
                 </textarea>
             </section>
 
-            <!-- ===== COMO FUNCIONA UM RANSOMWARE ===== -->
             <section data-markdown>
                 <textarea data-template>
                     <span class="label">CONCEITO</span>
@@ -435,7 +428,46 @@
                 </textarea>
             </section>
 
-            <!-- ===== BLOCO 1 ===== -->
+            <section data-markdown>
+                <textarea data-template>
+                    <span class="label">CONCEITO</span>
+                    ## Troca de Chaves — Alice, Bob e Eve
+                    
+                    <div class="box">
+                        <strong>Combinam em público (Eve pode ouvir):</strong><br>
+                        Base <span class="text-accent">g = 5</span> e Módulo <span class="text-accent">p = 23</span>
+                    </div>
+                    
+                    <div class="box">
+                        <strong>Alice (em segredo):</strong><br>
+                        Escolhe <span class="text-accent">a = 6</span><br>
+                        Calcula <span class="text-accent">A = 5^6 mod 23 = 8</span><br>
+                        Manda 8 para Bob (Eve vê o 8)
+                    </div>
+                    
+                    <div class="box">
+                        <strong>Bob (em segredo):</strong><br>
+                        Escolhe <span class="text-accent">b = 15</span><br>
+                        Calcula <span class="text-accent">B = 5^15 mod 23 = 19</span><br>
+                        Manda 19 para Alice (Eve vê o 19)
+                    </div>
+                    
+                    <div class="box">
+                        <strong>Chave compartilhada (ambos calculam):</strong><br>
+                        Alice: 19^6 mod 23 = <span class="text-accent">2</span><br>
+                        Bob: 8^15 mod 23 = <span class="text-accent">2</span>
+                    </div>
+                    
+                    <div class="box-red">
+                        <strong>Eve:</strong> Viu g=5, p=23, A=8, B=19<br>
+                        Precisa descobrir a ou b → <span class="text-red">problema do logaritmo discreto</span><br>
+                        Com números de 2048 bits: <span class="text-red">impossível na prática</span>
+                    </div>
+                    
+                    > "Alice e Bob combinaram uma chave secreta sem nunca trocá-la. A matemática funciona."
+                </textarea>
+            </section>
+
             <section>
                 <section data-markdown>
                     <textarea data-template>
@@ -496,7 +528,6 @@
                 </section>
             </section>
 
-            <!-- ===== BLOCO 2 ===== -->
             <section>
                 <section data-markdown>
                     <textarea data-template>
@@ -565,7 +596,6 @@
                 </section>
             </section>
 
-            <!-- ===== BLOCO 3 ===== -->
             <section>
                 <section data-markdown>
                     <textarea data-template>
@@ -591,6 +621,49 @@
                             <span class="text-red">Força bruta: 2^256 combinações. ~10^60 anos.</span><br>
                             <span class="terminal-font text-accent">AES e RSA fizeram seu trabalho. Ninguém passa por eles.</span>
                         </div>
+                    </textarea>
+                </section>
+
+                <section data-markdown>
+                    <textarea data-template>
+                        <span class="label">BLOCO 3</span>
+                        ## Caso 1 — Código Fonte
+
+                        ```c [1-3|5-6|8-14|16-20|22-24|26-30]
+                        unsigned char chave_aes[32];
+                        unsigned char nonce[16];
+                        RAND_bytes(chave_aes, 32);
+                        RAND_bytes(nonce, 16);
+
+                        EVP_PKEY *rsa = EVP_RSA_gen(4096);
+                        EVP_PKEY_CTX *wctx = EVP_PKEY_CTX_new(rsa, NULL);
+
+                        EVP_PKEY_encrypt_init(wctx);
+                        EVP_PKEY_CTX_set_rsa_padding(wctx, RSA_PKCS1_OAEP_PADDING);
+                        EVP_PKEY_CTX_set_rsa_oaep_md(wctx, EVP_sha256());
+                        unsigned char wrapped[512];
+                        size_t wrapped_len;
+                        EVP_PKEY_encrypt(wctx, wrapped, &wrapped_len, chave_aes, 32);
+
+                        EVP_CIPHER_CTX *ctx = EVP_CIPHER_CTX_new();
+                        EVP_EncryptInit_ex(ctx, EVP_aes_256_ctr(), NULL, chave_aes, nonce);
+                        unsigned char cifrado[4096];
+                        int len, ciph_len;
+                        EVP_EncryptUpdate(ctx, cifrado, &len, dados, tamanho);
+                        EVP_EncryptFinal_ex(ctx, cifrado + len, &ciph_len);
+
+                        FILE *f = fopen("documento.encrypted", "wb");
+                        fwrite(nonce, 1, 16, f);
+                        fwrite(wrapped, 1, wrapped_len, f);
+                        fwrite(cifrado, 1, len + ciph_len, f);
+                        fclose(f);
+
+                        OPENSSL_cleanse(chave_aes, 32);
+                        OPENSSL_cleanse(nonce, 16);
+                        EVP_CIPHER_CTX_free(ctx);
+                        EVP_PKEY_CTX_free(wctx);
+                        EVP_PKEY_free(rsa);
+                        ```
                     </textarea>
                 </section>
 
@@ -631,7 +704,38 @@
                 <section data-markdown>
                     <textarea data-template>
                         <span class="label-red">BLOCO 3</span>
-                        ## Caso 2 — O Decryptor (10 Minutos Depois)
+                        ## Caso 2 — Código Fonte
+                        ```c [1-2|3-4|5-7|9-13|15-19|21-25]
+                        unsigned char chave[] = "MinhaChaveSuperSecreta123456";
+                        unsigned char nonce[16] = {0};
+
+                        unsigned char lixo[512] = {0};
+                        unsigned char dados[] = "ARK REACTOR v3";
+                        unsigned char cifrado[4096];
+                        int len, ciph_len;
+
+                        EVP_CIPHER_CTX *ctx = EVP_CIPHER_CTX_new();
+                        EVP_EncryptInit_ex(ctx, EVP_aes_256_ctr(),
+                                           NULL, chave, nonce);
+                        EVP_EncryptUpdate(ctx, cifrado, &len,
+                                          dados, strlen((char *)dados));
+                        EVP_EncryptFinal_ex(ctx, cifrado + len, &ciph_len);
+
+                        FILE *f = fopen("documento_falho.encrypted", "wb");
+                        fwrite(nonce, 1, 16, f);
+                        fwrite(lixo, 1, 512, f);
+                        fwrite(cifrado, 1, len + ciph_len, f);
+                        fclose(f);
+
+                        EVP_CIPHER_CTX_free(ctx);
+                        ```
+                    </textarea>
+                </section>
+
+                <section data-markdown>
+                    <textarea data-template>
+                        <span class="label-red">BLOCO 3</span>
+                        ## Caso 2 — O Decryptor 
                         <span class="terminal-font text-muted">Análise do binário com strings:</span><br>
                         <span class="terminal-font text-accent">CHAVE_RECUPERADA = b"MinhaChaveSuperSecreta123456"</span><br>
                         <span class="terminal-font text-accent">NONCE_RECUPERADO = b"\x00" * 16</span>
@@ -643,6 +747,40 @@
                             <strong>Resultado:</strong> Todos os arquivos recuperados em segundos.<br>
                             <span class="terminal-font text-accent">"Não precisei quebrar AES. Só precisei ler o código."</span>
                         </div>
+                    </textarea>
+                </section>
+
+
+                <section data-markdown>
+                    <textarea data-template>
+                        <span class="label-red">BLOCO 3</span>
+                        ## Caso 2 — Decryptor
+
+                        ```c [1-2|3-5|7-14|16-17]
+                        unsigned char chave[] = "MinhaChaveSuperSecreta123456";
+                        unsigned char nonce[16];
+
+                        int fd = open("documento_falho.encrypted", O_RDONLY);
+                        read(fd, nonce, 16);
+                        lseek(fd, 512, SEEK_CUR);
+
+                        unsigned char cifrado[4096];
+                        int tamanho = read(fd, cifrado, sizeof(cifrado));
+                        close(fd);
+
+                        EVP_CIPHER_CTX *ctx = EVP_CIPHER_CTX_new();
+                        EVP_DecryptInit_ex(ctx, EVP_aes_256_ctr(),
+                                           NULL, chave, nonce);
+                        unsigned char recuperado[4096];
+                        int len, rec_len;
+                        EVP_DecryptUpdate(ctx, recuperado, &len,
+                                          cifrado, tamanho);
+                        EVP_DecryptFinal_ex(ctx, recuperado + len, &rec_len);
+
+                        recuperado[len + rec_len] = '\0';
+                        printf("[+] Recuperado: %s\n", recuperado);
+                        EVP_CIPHER_CTX_free(ctx);
+                        ```
                     </textarea>
                 </section>
 
@@ -663,7 +801,6 @@
                 </section>
             </section>
 
-            <!-- ===== BÔNUS ===== -->
             <section>
                 <section data-markdown>
                     <textarea data-template>
@@ -685,7 +822,7 @@
                 <section data-markdown>
                     <textarea data-template>
                         <span class="label">BÔNUS</span>
-                        ## O Resultado do AES Caseiro 💥
+                        ## O Resultado do AES Caseiro 
                         <span class="terminal-font text-muted">$ cat documento.txt</span><br>
                         <span class="terminal-font">Este é um documento confidencial da empresa XYZ.</span>
                         <div class="separator"></div>
@@ -693,13 +830,13 @@
                         <span class="terminal-font text-accent">[✔] Cifrado: doc.enc</span>
                         <div class="separator"></div>
                         <span class="terminal-font text-muted">$ ./aes_caseiro decrypt doc.enc doc_rec.txt</span><br>
-                        <span class="terminal-font text-red">⚠ Decifragem pode estar CORROMPIDA!</span>
+                        <span class="terminal-font text-red">Decifragem pode estar CORROMPIDA!</span>
                         <div class="separator"></div>
                         <span class="terminal-font text-muted">$ cat doc_rec.txt</span><br>
                         <span class="terminal-font text-red">Este é um d�cumento confi�encial da e�presa XYZ.</span><br>
                         <span class="terminal-font text-red">C�ntém dados sen��veis que preci�am ser prote�idos.</span>
                         <div class="separator"></div>
-                        <span class="text-red">☝️ CORROMPIDO! Nem o próprio autor consegue reverter. A cifra é lixo.</span>
+                        <span class="text-red"> CORROMPIDO! Nem o próprio autor consegue reverter. A cifra é lixo.</span>
                     </textarea>
                 </section>
 
@@ -707,7 +844,7 @@
                     <textarea data-template>
                         <span class="label">BÔNUS</span>
                         ## Moral do AES Caseiro
-                        | ❌ NUNCA FAÇA | ✅ SEMPRE FAÇA |
+                        |  NUNCA FAÇA |  SEMPRE FAÇA |
                         |---------------|----------------|
                         | Implementar criptografia do zero | Usar bibliotecas auditadas |
                         | Copiar S-Box da internet | Testar com vetores oficiais (NIST) |
@@ -718,7 +855,6 @@
                 </section>
             </section>
 
-            <!-- ===== CONCLUSÃO ===== -->
             <section>
                 <section data-markdown>
                     <textarea data-template>
@@ -763,7 +899,6 @@
                 </section>
             </section>
 
-            <!-- ===== REFERÊNCIAS ===== -->
             <section data-markdown>
                 <textarea data-template>
                     <span class="label">REFERÊNCIAS</span>
