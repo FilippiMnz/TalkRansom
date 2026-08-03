@@ -350,12 +350,14 @@
                     
                     <div style="display: flex; align-items: center; gap: 40px;">
                         <div style="line-height: 2.0; font-size: 0.9em;">
-                            -> <span class="terminal-font text-accent">Filippi Reis</span>, também conhecido como <span class="terminal-font text-accent">Smith</span>.<br>
-                            -> Segurança ofensiva. Security researcher. CTF Player<br>
+                            -> <span class="terminal-font text-accent">Filippi Reis</span>,  AKA <span class="terminal-font text-accent"> Smith</span>.<br>
+                            -> Baiano em terras sergipanas <br>
+                            -> Offensive Security. Security researcher. CTF Player<br>
                             -> Maluco em tempo integral - AuDHD • Procastinador Profissional<br>
                             -> Estudante CComp - Universidade Federal de Sergipe<br>
                             -> @/RaulHC/Axesec/AFK<br>
-                            -> Foco: Purple Team • Baixo Nivel • Criptografia.
+                            -> Foco: Purple Team • Baixo Nivel • Criptografia.<br>
+                            -> Curto analises, desafios, rock, livros e jogos Souls
                         </div>
                         <div style="flex-shrink: 0;">
                             <img src="chapeu.png" style="width: 200px; height: 200px; border-radius: 4px; border: 1px solid rgba(168, 85, 247, 0.4); object-fit: cover; filter: grayscale(30%);" />
@@ -374,18 +376,6 @@
                     * O que permite criar decryptors é puramente **erro humano**.
                     * Implementação incorreta, gerenciamento inadequado de chaves, ou apreensão policial.
                     * **PEBKAC: Problem Exists Between Keyboard And Chair.** 
-                </textarea>
-            </section>
-
-            <section data-markdown>
-                <textarea data-template>
-                    ## Estrutura da Talk
-                    | Bloco | Tema |
-                    |-------|------|
-                    | 1 | A Criptografia Funciona |
-                    | 2 | O Problema é o Dev  |
-                    | 3 | Demonstração Prática |
-                    | Bonus | AES caseiro em C puro |
                 </textarea>
             </section>
 
@@ -604,7 +594,6 @@
                         **Objetivo:** Provar a tese ao vivo. VM isolada. Três cenários.
                         * **Caso 1:** Ransomware bem implementado → AES-256 + RSA-4096 + limpeza de memória.
                         * **Caso 2:** MESMO código, com erro humano → chave hardcoded, nonce fixo, sem RSA.
-                        * **Bônus:** AES implementado manualmente em C → S-Box errada, rounds errados.
                     </textarea>
                 </section>
 
@@ -804,60 +793,6 @@
             <section>
                 <section data-markdown>
                     <textarea data-template>
-                        <span class="label">BÔNUS</span>
-                        ## O Perigo do "AES de Garagem"
-                        Implementação manual de AES-256 em C puro. Sem bibliotecas.
-                        * S-Box, MixColumns, KeyExpansion — tudo na mão. Semanas de trabalho.
-                        * Resultado: **cifra podre**. Insegura. Quebrada em minutos por um criptoanalista.
-                        <div class="box-red">
-                            <strong>Erros introduzidos (propositais, para demonstrar):</strong><br>
-                            • S-Box com UM byte errado (0x42 ao invés de 0x41)<br>
-                            • MixColumns com operações de GF(2^8) faltando<br>
-                            • Número errado de rounds (10 vs 14 — AES-128 em vez de AES-256)<br>
-                            • Senha ASCII direto como chave, sem KDF (PBKDF2, Argon2)
-                        </div>
-                    </textarea>
-                </section>
-
-                <section data-markdown>
-                    <textarea data-template>
-                        <span class="label">BÔNUS</span>
-                        ## O Resultado do AES Caseiro 
-                        <span class="terminal-font text-muted">$ cat documento.txt</span><br>
-                        <span class="terminal-font">Este é um documento confidencial da empresa XYZ.</span>
-                        <div class="separator"></div>
-                        <span class="terminal-font text-muted">$ ./aes_caseiro encrypt documento.txt doc.enc</span><br>
-                        <span class="terminal-font text-accent">[✔] Cifrado: doc.enc</span>
-                        <div class="separator"></div>
-                        <span class="terminal-font text-muted">$ ./aes_caseiro decrypt doc.enc doc_rec.txt</span><br>
-                        <span class="terminal-font text-red">Decifragem pode estar CORROMPIDA!</span>
-                        <div class="separator"></div>
-                        <span class="terminal-font text-muted">$ cat doc_rec.txt</span><br>
-                        <span class="terminal-font text-red">Este é um d�cumento confi�encial da e�presa XYZ.</span><br>
-                        <span class="terminal-font text-red">C�ntém dados sen��veis que preci�am ser prote�idos.</span>
-                        <div class="separator"></div>
-                        <span class="text-red"> CORROMPIDO! Nem o próprio autor consegue reverter. A cifra é lixo.</span>
-                    </textarea>
-                </section>
-
-                <section data-markdown>
-                    <textarea data-template>
-                        <span class="label">BÔNUS</span>
-                        ## Moral do AES Caseiro
-                        |  NUNCA FAÇA |  SEMPRE FAÇA |
-                        |---------------|----------------|
-                        | Implementar criptografia do zero | Usar bibliotecas auditadas |
-                        | Copiar S-Box da internet | Testar com vetores oficiais (NIST) |
-                        | Usar senha como chave direto | Usar KDF: PBKDF2, bcrypt, Argon2 |
-                        | Confiar em "parece que funciona" | OpenSSL, libsodium, cryptography.py |
-                        > "Implementar AES do zero é um exercício acadêmico fascinante. Usar em produção é negligência pura."
-                    </textarea>
-                </section>
-            </section>
-
-            <section>
-                <section data-markdown>
-                    <textarea data-template>
                         <span class="label">CONCLUSÃO</span>
                         ## A Tese Está Provada
                         <div class="box">
@@ -899,6 +834,17 @@
                 </section>
             </section>
 
+
+            <section data-markdown>
+                <textarea data-template>
+                    <div style="flex-shrink: 0;">
+                            <img src="penitent.gif" style="width: 300px; height: 300px; object-fit: cover; filter: grayscale(30%);" />
+                    </div>
+                    <span class="terminal-font text-accent">Obrigado! Dúvidas?</span><br>
+                    <span class="terminal-font text-muted">[smith@blackhaven-01 ~]$ exit</span>
+                </textarea>
+            </section>            
+
             <section data-markdown>
                 <textarea data-template>
                     <span class="label">REFERÊNCIAS</span>
@@ -912,9 +858,6 @@
                     * **CryptoHack:** cryptohack.org/
                     * **pwn.college:** pwn.college/s 
                     * **An Introduction to Mathematical Cryptography - Jeffrey Hoffstein** 
-                    <div class="separator"></div>
-                    <span class="terminal-font text-accent">Obrigado! Dúvidas?</span><br>
-                    <span class="terminal-font text-muted">[smith@blackhaven-01 ~]$ exit</span>
                 </textarea>
             </section>
 
