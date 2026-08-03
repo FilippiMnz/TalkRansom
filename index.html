@@ -65,18 +65,18 @@
             letter-spacing: -0.02em;
         }
         .reveal h1 {
-            font-size: 2.6em;
+            font-size: clamp(2em, 5vw, 2.6em);
             font-weight: 800;
             background: linear-gradient(135deg, #c084fc 0%, #a855f7 50%, #7e22ce 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
-        .reveal h2 { font-size: 1.8em; color: #c084fc !important; }
-        .reveal h3 { font-size: 1.3em; color: #a855f7 !important; }
+        .reveal h2 { font-size: clamp(1.4em, 3.5vw, 1.8em); color: #c084fc !important; }
+        .reveal h3 { font-size: clamp(1em, 2.5vw, 1.3em); color: #a855f7 !important; }
         .reveal .slides section {
             text-align: left;
-            padding: 0 40px;
+            padding: 0 clamp(16px, 3vw, 40px);
         }
         .reveal a { color: var(--accent); }
 
@@ -87,17 +87,19 @@
 
         .box {
             border: 1px solid var(--border-accent);
-            padding: 24px;
+            padding: clamp(16px, 2vw, 24px);
             background: var(--bg-card);
             border-radius: 4px;
             margin: 16px 0;
+            font-size: clamp(0.6em, 1.5vw, 0.8em);
         }
         .box-red {
             border: 1px solid rgba(239, 68, 68, 0.3);
-            padding: 24px;
+            padding: clamp(16px, 2vw, 24px);
             background: rgba(239, 68, 68, 0.03);
             border-radius: 4px;
             margin: 16px 0;
+            font-size: clamp(0.6em, 1.5vw, 0.8em);
         }
         .text-red { color: var(--red); }
         .text-accent { color: #c084fc; }
@@ -132,20 +134,22 @@
         }
 
         pre {
-            font-size: 0.7em !important;
+            font-size: clamp(0.45em, 1.2vw, 0.7em) !important;
             border-radius: 4px !important;
             border: 1px solid var(--border) !important;
             background: #0f0f11 !important;
+            max-height: 60vh;
+            overflow-y: auto;
         }
         pre code {
             border-radius: 4px !important;
-            padding: 20px !important;
+            padding: clamp(12px, 2vw, 20px) !important;
             font-size: 1em !important;
             line-height: 1.6 !important;
         }
 
         table {
-            font-size: 0.7em;
+            font-size: clamp(0.5em, 1.2vw, 0.7em);
             border-collapse: collapse;
             width: 100%;
             margin: 12px 0;
@@ -242,8 +246,8 @@
             position: fixed;
             top: 18px;
             right: 28px;
-            width: 38px;
-            height: 38px;
+            width: clamp(28px, 3vw, 38px);
+            height: clamp(28px, 3vw, 38px);
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23a855f7' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolygon points='13 2 3 14 12 14 11 22 21 10 12 10 13 2'/%3E%3C/svg%3E");
             background-size: contain;
             background-repeat: no-repeat;
@@ -275,8 +279,8 @@
             color: #a855f7 !important;
             background: transparent !important;
             border: none !important;
-            width: 40px !important;
-            height: 40px !important;
+            width: clamp(32px, 4vw, 40px) !important;
+            height: clamp(32px, 4vw, 40px) !important;
             transition: all 0.2s ease !important;
         }
         .reveal .controls button:hover {
@@ -329,6 +333,31 @@
         .reveal .progress span {
             background: linear-gradient(90deg, #7e22ce, #a855f7, #c084fc) !important;
         }
+
+        .whoami-grid {
+            display: flex;
+            align-items: center;
+            gap: clamp(20px, 4vw, 40px);
+            flex-wrap: wrap;
+        }
+        .whoami-grid img {
+            width: clamp(120px, 20vw, 200px);
+            height: clamp(120px, 20vw, 200px);
+            border-radius: 4px;
+            border: 1px solid rgba(168, 85, 247, 0.4);
+            object-fit: cover;
+            filter: grayscale(30%);
+        }
+
+        @media (max-width: 768px) {
+            .whoami-grid {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .reveal .slides section {
+                padding: 0 16px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -348,8 +377,8 @@
                 <textarea data-template>
                     ## whoami
                     
-                    <div style="display: flex; align-items: center; gap: 40px;">
-                        <div style="line-height: 2.0; font-size: 0.9em;">
+                    <div class="whoami-grid">
+                        <div style="line-height: 2.0; font-size: clamp(0.7em, 1.5vw, 0.9em);">
                             -> <span class="terminal-font text-accent">Filippi Reis</span>,  AKA <span class="terminal-font text-accent"> Smith</span>.<br>
                             -> Baiano em terras sergipanas <br>
                             -> Offensive Security. Security researcher. CTF Player<br>
@@ -360,7 +389,7 @@
                             -> Curto analises, desafios, rock, livros e jogos Souls
                         </div>
                         <div style="flex-shrink: 0;">
-                            <img src="chapeu.png" style="width: 200px; height: 200px; border-radius: 4px; border: 1px solid rgba(168, 85, 247, 0.4); object-fit: cover; filter: grayscale(30%);" />
+                            <img src="chapeu.png" style="width: clamp(120px, 20vw, 200px); height: clamp(120px, 20vw, 200px); border-radius: 4px; border: 1px solid rgba(168, 85, 247, 0.4); object-fit: cover; filter: grayscale(30%);" />
                         </div>
                     </div>
                     <br>
@@ -418,45 +447,109 @@
                 </textarea>
             </section>
 
-            <section data-markdown>
-                <textarea data-template>
-                    <span class="label">CONCEITO</span>
-                    ## Troca de Chaves — Alice, Bob e Eve
-                    
-                    <div class="box">
-                        <strong>Combinam em público (Eve pode ouvir):</strong><br>
-                        Base <span class="text-accent">g = 5</span> e Módulo <span class="text-accent">p = 23</span>
-                    </div>
-                    
-                    <div class="box">
-                        <strong>Alice (em segredo):</strong><br>
-                        Escolhe <span class="text-accent">a = 6</span><br>
-                        Calcula <span class="text-accent">A = 5^6 mod 23 = 8</span><br>
-                        Manda 8 para Bob (Eve vê o 8)
-                    </div>
-                    
-                    <div class="box">
-                        <strong>Bob (em segredo):</strong><br>
-                        Escolhe <span class="text-accent">b = 15</span><br>
-                        Calcula <span class="text-accent">B = 5^15 mod 23 = 19</span><br>
-                        Manda 19 para Alice (Eve vê o 19)
-                    </div>
-                    
-                    <div class="box">
-                        <strong>Chave compartilhada (ambos calculam):</strong><br>
-                        Alice: 19^6 mod 23 = <span class="text-accent">2</span><br>
-                        Bob: 8^15 mod 23 = <span class="text-accent">2</span>
-                    </div>
-                    
-                    <div class="box-red">
-                        <strong>Eve:</strong> Viu g=5, p=23, A=8, B=19<br>
-                        Precisa descobrir a ou b → <span class="text-red">problema do logaritmo discreto</span><br>
-                        Com números de 2048 bits: <span class="text-red">impossível na prática</span>
-                    </div>
-                    
-                    > "Alice e Bob combinaram uma chave secreta sem nunca trocá-la. A matemática funciona."
-                </textarea>
-            </section>
+<section data-markdown>
+<textarea data-template>
+
+<span class="label">CONCEITO</span>
+
+## Diffie-Hellman
+### Como criar uma chave sem nunca enviá-la
+
+<div class="box fragment">
+<strong> Informações públicas</strong><br>
+
+Base: <span class="text-accent">g = 5</span><br>
+Módulo: <span class="text-accent">p = 23</span>
+
+Todos podem conhecer esses valores.
+</div>
+
+<div class="box fragment">
+<strong>Alice</strong><br>
+
+Segredo:
+
+<span class="text-accent">a = 6</span>
+
+Calcula:
+
+<span class="text-accent">A = 5⁶ mod 23 = 8</span>
+
+ Envia apenas o número <span class="text-accent">8</span>.
+</div>
+
+<div class="box fragment">
+<strong> Bob</strong><br>
+
+Segredo:
+
+<span class="text-accent">b = 15</span>
+
+Calcula:
+
+<span class="text-accent">B = 5¹⁵ mod 23 = 19</span>
+
+ Envia apenas o número <span class="text-accent">19</span>.
+</div>
+
+<blockquote class="fragment">
+Alice e Bob nunca trocaram seus segredos.
+</blockquote>
+
+</textarea>
+</section>
+
+<section data-markdown>
+<textarea data-template>
+
+<span class="label">CONCEITO</span>
+
+## O que Eve consegue ver?
+
+<div class="box fragment">
+<strong>👁 Eve capturou toda a comunicação</strong>
+
+g = 5
+
+p = 23
+
+A = 8
+
+B = 19
+</div>
+
+<div class="box fragment">
+<strong>Mesmo assim...</strong>
+
+Alice calcula:
+
+<span class="text-accent">19⁶ mod 23 = 2</span>
+
+Bob calcula:
+
+<span class="text-accent">8¹⁵ mod 23 = 2</span>
+
+Os dois chegam exatamente à mesma chave.
+</div>
+
+<div class="box-red fragment">
+<strong>Por que Eve não consegue?</strong>
+
+Ela precisa descobrir o segredo de Alice ou Bob.
+
+Isso significa resolver o
+
+<span class="text-red">Problema do Logaritmo Discreto.</span>
+
+Com chaves modernas (2048+ bits):
+
+<strong>computacionalmente inviável.</strong>
+</div>
+
+> "A chave nunca passou pela rede. Só a matemática."
+
+</textarea>
+</section>
 
             <section>
                 <section data-markdown>
@@ -590,8 +683,8 @@
                 <section data-markdown>
                     <textarea data-template>
                         <span class="label">BLOCO 3</span>
-                        ## Demonstração Prática 🧪
-                        **Objetivo:** Provar a tese ao vivo. VM isolada. Três cenários.
+                        ## Demo
+                        **Objetivo:** Provar a tese ao vivo. Containers isolados. dois cenários.
                         * **Caso 1:** Ransomware bem implementado → AES-256 + RSA-4096 + limpeza de memória.
                         * **Caso 2:** MESMO código, com erro humano → chave hardcoded, nonce fixo, sem RSA.
                     </textarea>
@@ -600,7 +693,7 @@
                 <section data-markdown>
                     <textarea data-template>
                         <span class="label">BLOCO 3</span>
-                        ## Caso 1: O Ransomware Perfeito
+                        ## Caso 1: O Ransomware "Perfeito"
                         * AES-256-CTR com chave aleatória (`/dev/urandom`).
                         * RSA-4096 OAEP SHA-256 para key wrapping.
                         * Nonce único por sessão. Limpeza explícita de memória (`memset` + `del`).
