@@ -928,8 +928,9 @@ Com chaves modernas (2048+ bits):
                         #include <unistd.h>
                         #include <openssl/evp.h>
 
+                        const char chave[] = "MinhaChaveSuperSecreta123456";
+
                         int main(void) {
-                            unsigned char chave[] = "MinhaChaveSuperSecreta123456";
                             unsigned char nonce[16] = {0};
                             unsigned char lixo[512] = {0};
                             unsigned char dados[8192], cifrado[8192];
@@ -940,7 +941,7 @@ Com chaves modernas (2048+ bits):
                             fclose(f);
 
                             EVP_CIPHER_CTX *ctx = EVP_CIPHER_CTX_new();
-                            EVP_EncryptInit_ex(ctx, EVP_aes_256_ctr(), NULL, chave, nonce);
+                            EVP_EncryptInit_ex(ctx, EVP_aes_256_ctr(), NULL, (unsigned char*)chave, nonce);
                             EVP_EncryptUpdate(ctx, cifrado, &len, dados, tamanho);
                             EVP_EncryptFinal_ex(ctx, cifrado + len, &ciph_len);
                             len += ciph_len;
