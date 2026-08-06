@@ -701,7 +701,21 @@ Com chaves modernas (2048+ bits):
                         }
                         ```
                     </textarea>
-                </section>   
+                </section>  
+
+                <section data-markdown>
+                    <textarea data-template>
+                        <span class="label-red">BLOCO 1</span>
+                        ## CryptoLocker
+                        <br>
+                        <div style="text-align: center;">
+                            <img src="img_01.png" 
+                                style="width: 60%; border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 4px;" />
+                            <br><span class="text-muted" style="font-size: 0.5em;">Tela de Resgate Cryptolocker</span>
+                        </div>
+                    </textarea>
+                </section>
+
 
 
                 <section data-markdown>
@@ -730,6 +744,34 @@ Com chaves modernas (2048+ bits):
                         </div>
                     </textarea>
                 </section>
+
+                <section data-markdown>
+                    <textarea data-template>
+                        <span class="label">BLOCO 1</span>
+                        ## Hive (2021-2022)
+
+                        * **O Hive usava um sistema Hibrido como o Cryptolocker**
+                        * **Crifra com AES-256-GCM**
+                        * **Protege AES com RSA-2048 do C2** <br> <br>
+                        #### AES GCM - Galois/Counter Mode é um modo de criptografia com simetria autenticada
+                        * **Diferentemente do AES CBC usado no criptolocker, o GCM avisa se os dados foram alterados**
+
+                    </textarea>
+                </section>
+                <section data-markdown>
+                    <textarea data-template>
+                        <span class="label-red">BLOCO 1</span>
+                        ## Hive
+                        <br>
+                        <div style="text-align: center;">
+                            <img src="hive.png" 
+                                style="width: 60%; border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 4px;" />
+                            <br><span class="text-muted" style="font-size: 0.5em;">Tela de Resgate Hive</span>
+                        </div>
+                    </textarea>
+                </section>
+
+
                 <section data-markdown>
                     <textarea data-template>
                         <span class="label">CONCEITO</span>
@@ -758,11 +800,64 @@ Com chaves modernas (2048+ bits):
                         </div>
                     </textarea>
                 </section>
+
+                <section data-markdown>
+                    <textarea data-template>
+                        <span class="label-red">BLOCO 1</span>
+                        ## NotPetya (2017)
+                        <br>
+                        <div style="text-align: center;">
+                            <img src="NotPetya-ransomware-or-malware.png" 
+                                style="width: 60%; border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 4px;" />
+                            <br><span class="text-muted" style="font-size: 0.5em;">Tela de Resgate — "Oops, your important files are encrypted."</span>
+                        </div>
+                    </textarea>
+                </section>
+
+                <section data-markdown>
+                    <textarea data-template>
+                        <span class="label">BLOCO 1</span>
+                        ## NotPetya (2017) — A Vacina Acidental
+
+                        * Durante a análise, pesquisadores descobriram que o NotPetya verificava a existência de um arquivo específico:
+                        
+                        <div class="box" style="text-align: center;">
+                            <span class="terminal-font text-accent" style="font-size: 1.2em;">
+                                C:\Windows\perfc.dat
+                            </span>
+                        </div>
+
+                        * Se o arquivo **existisse**, o wiper interpretava que a máquina **já estava comprometida** e interrompia a execução.
+                        * A solução foi simples e genial:
+                        
+                        <div class="box fragment" style="text-align: center;">
+                            <span class="terminal-font" style="font-size: 1.1em;">
+                                echo "" &gt; C:\Windows\perfc.dat
+                            </span><br>
+                            <span class="text-muted">Um arquivo vazio. Uma sentinela. Uma vacina.</span>
+                        </div>
+
+                        <div class="box-red fragment">
+                            <strong>Um kill switch acidental.</strong><br>
+                            Mas a vacina só protegia contra NOVAS infecções.<br>
+                            Se o wiper já tivesse executado... <span class="text-accent">era tarde demais.</span>
+                        </div>
+                    </textarea>
+                </section>
+
             </section>
+            
             <section data-markdown>
                 <textarea data-template>
-                    **Ate aqui, vimos alguns casos onde a criptografia funcionou de maneira impecavel, a implementação do ransomware estava perfeita, de modo que somente apreensão policial resolveu** <br> <br>
-                    **Agora Vamos ver o que acontece quando não se sabe o que está fazendo**
+        <div style="font-size: 1.6em; line-height: 1.8;">
+            Até aqui, vimos casos onde a <span class="text-accent">criptografia funcionou de maneira impecável</span>.<br>
+            A implementação do ransomware estava <span class="text-accent">perfeita</span>.<br>
+            <span class="text-muted" style="font-size: 0.9em;">Somente apreensão policial resolveu.</span> <br> <br>
+            </div>        
+            <div style="font-size: 1.6em; line-height: 1.8;" class="fragment">
+                Agora vamos ver o que acontece<br>
+                quando <span class="text-red">não se sabe</span> o que está fazendo.
+            </div>
                 </textarea>
             </section>
 
@@ -781,26 +876,66 @@ Com chaves modernas (2048+ bits):
                         ## Petya — Versões Iniciais (2016)
                         * **Abordagem inteligente:** Cifrava a MFT (Master File Table), não os arquivos.
                         * Sistema nem conseguia "ver" os arquivos no disco.
-                        * **Falha:** Derivação de chave com entropia baixa. Seed previsível (dados da vítima).
-                        <div class="box-red">
-                            <strong>Resultado:</strong> Decryptors exploraram a derivação frágil.<br>
-                            A ideia era genial. A execução deixou a porta aberta.
-                        </div>
+                        * Proopagação via Dropbox( falso curriculo) + E-mail
+                        * **Falha:** Derivação de chave com entropia baixa, cerca de 46 bits.
                     </textarea>
                 </section>
 
                 <section data-markdown>
                     <textarea data-template>
-                        <span class="label-red">BLOCO 2</span>
-                        ## Stampado — Criptografia mediocre
-                        A "criptografia" era **XOR com reutilização de chave**.
-                        * Chave curta e repetida ciclicamente.
-                        * Dois arquivos com mesma keystream: `Cifra1 XOR Cifra2 = Plain1 XOR Plain2`.
-                        * Conhecendo um cabeçalho (ex: `%PDF-1.4`), recupera todo o resto.
-                        * Chave extraível do binário com `strings`.
-                        > "A matemática não perdoa preguiça. Ainda mais com XOR."
+                        <span class="label-red">BLOCO 3</span>
+                        ## Petya — Exemplo de Funcionamento da chave <br>
+                        * **O nucleo Original nao usava AES, mas sim Salsa20** 
+                        * **Variantes do Petya como o Mischa ultilizavam AES para arquivos locais** <br> <br>
+
+                        ```go
+                        // Constantes mágicas do Salsa20 encontradas no binário:
+                        r.Const0 = 0x7865  // "ex"
+                        r.Const2 = 0x646e  // "nd"  
+                        r.Const4 = 0x2d32  // " 2"
+                        r.Const6 = 0x6574  // "te"
+                        // Junto forma: "expand 32-byte k"
+
+                        ```
                     </textarea>
                 </section>
+
+                <section data-markdown>
+                    <textarea data-template>
+                        <span class="label-red">BLOCO 3</span>
+                        ## Petya — Exemplo de Decryptor <br>
+
+                        ```go
+                        // github.com/leo-stone/hack-petya
+                                
+                        // Alfabeto da chave:  57 caracteres
+                        geneSet := "123456789abcdefghijkmnopqrstuvwxABCDEFGHJKLMNPQRSTUVWX"
+                                
+                        // Chave: 8 caracteres + 'x' como separador
+                        // Formato: "1x2x3x4x5x6x7x8x" (16 chars, mas só 8 de entropia)
+                                
+                        // Nonce extraído do setor cifrado do disco (dado público)
+                        nounce, _ := ioutil.ReadFile("nonce.txt")
+                                
+                        // Algoritmo GENÉTICO para encontrar a chave
+                        solver := genetic.NewSolver()
+                        result := solver.GetBest(getFitness, geneSet, 8)
+                        ```
+                    </textarea>
+                </section>
+                <section data-markdown>
+                    <textarea data-template>
+                        <span class="label-red">BLOCO 1</span>
+                        ## Petya 
+                        <br>
+                        <div style="text-align: center;">
+                            <img src="decrypting_petya.webp" 
+                                style="width: 60%; border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 4px;" />
+                            <br><span class="text-muted" style="font-size: 0.5em;">Tela de Resgate Petya</span>
+                        </div>
+                    </textarea>
+                </section>
+
 
                 <section data-markdown>
                     <textarea data-template>
@@ -1316,6 +1451,7 @@ Com chaves modernas (2048+ bits):
                     * **Ransomware Decryptor tools:** avast.com/en-us/ransomware-decryption-tools#!
                     * **Analise NotPetya:** idafchev.github.io/writeup/2017/07/21/petya_ransomware_analysis.html
                     * **Malware-Samples:** github.com/fabrimagic72/malware-samples/tree/master/Ransomware
+                    * **Simulação CryptoLocker em Java:** github.com/SheldonHH/ransomware_simulation/tree/master/malware/encryption/src
                 </textarea>
             </section>
 
